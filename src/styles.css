@@ -1,1 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+  /* background: linear-gradient(to bottom, rgb(102, 153, 204) 25%, rgb(204, 102, 102)); */
+  font-size: 14px !important;
+  color: #464646 !important;
+  box-sizing: border-box;
+  --s: 100px; /* control the size */
+  --c: #f5f5f5; /* first color */
+
+  --_g: #0000 8%, var(--c) 0 17%, #0000 0 58%;
+  background: linear-gradient(135deg, #0000 20.5%, var(--c) 0 29.5%, #0000 0) 0
+      calc(var(--s) / 4),
+    linear-gradient(45deg, var(--_g)) calc(var(--s) / 2) 0,
+    linear-gradient(135deg, var(--_g), var(--c) 0 67%, #0000 0),
+    linear-gradient(
+      45deg,
+      var(--_g),
+      var(--c) 0 67%,
+      #0000 0 83%,
+      var(--c) 0 92%,
+      #0000 0
+    ),
+    #7fbfff !important; /* second color */
+  background-size: var(--s) var(--s) !important;
+}

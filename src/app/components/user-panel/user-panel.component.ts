@@ -6,6 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-user-panel',
@@ -19,9 +20,8 @@ export class UserPanelComponent implements OnInit {
   loginFormMode: 'login' | 'register' = 'login';
   registerForm: FormGroup;
   loginForm: FormGroup;
-  // isLoggingIn: boolean = false;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder, private authService: AuthService) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -34,9 +34,7 @@ export class UserPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Tutaj możesz dodać logikę sprawdzającą, czy użytkownik jest zalogowany
-    // Na potrzeby przykładu ustawiamy isLoggedIn na false
-    this.isLoggedIn = false;
+    this.isLoggedIn = this.authService.isLoggedIn();
   }
 
   register() {

@@ -1,6 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
 body {
-  /* background: linear-gradient(to bottom, rgb(102, 153, 204) 25%, rgb(204, 102, 102)); */
   font-size: 14px !important;
   color: #464646 !important;
   box-sizing: border-box;
@@ -22,4 +20,28 @@ body {
     ),
     #7fbfff !important; /* second color */
   background-size: var(--s) var(--s) !important;
+}
+
+
+.btn {
+  padding: 10px!important;
+  background-color: rgba(127, 191, 255, 0.8)!important;
+  border: 1px solid #ccc!important;
+  border-radius: 10%!important;
+  min-width: 90px!important;
+  display: block!important;
+  text-align: center!important;
+  text-decoration: none!important;
+  color: #464646!important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4)!important;
+}
+
+.btn:hover {
+  background: linear-gradient(to right top, #E79B6A 20%, #FFF1C0);
+  color: #f5f5f5;
+}
+
+.btn:disabled:hover {
+  background: linear-gradient(to right top, #E79B6A 20%, #FFF1C0);
+  color: #f5f5f5;
 }

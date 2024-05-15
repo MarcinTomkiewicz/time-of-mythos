@@ -38,6 +38,10 @@
 .menu {
   height: 2rem;
   flex-grow: 1;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  gap: 15px;
 }
 
 .login-form {

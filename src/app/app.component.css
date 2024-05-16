@@ -22,6 +22,7 @@
 
 .main-logo {
   border-radius: 8px;
+  width: 100%;
 }
 
 .menu-wrapper {
@@ -42,7 +43,7 @@
   display: flex;
   justify-content: flex-start;
   flex-direction: row;
-  gap: 15px;
+  gap: 10px;
 }
 
 .login-form {

@@ -5,16 +5,18 @@ import { UserPanelComponent } from './components/user-panel/user-panel.component
 import { TopMenuComponent } from './components/top-menu/top-menu.component';
 import { AuthFormsComponent } from './common/auth-forms/auth-forms.component';
 import { AuthService } from './services/auth-service';
+import { MainContentComponent } from './components/main-content/main-content.component';
+import { SideMenuComponent } from './components/side-menu/side-menu.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, UserPanelComponent, TopMenuComponent, AuthFormsComponent],
+  imports: [CommonModule, RouterOutlet, UserPanelComponent, TopMenuComponent, AuthFormsComponent, MainContentComponent, SideMenuComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'Time of Mythos';
+  title = 'Time Of Mythos - Embark on an Epic Journey Through Ancient Greece!';
   isLoggedIn: boolean = false;
 
   constructor(private authService: AuthService) 

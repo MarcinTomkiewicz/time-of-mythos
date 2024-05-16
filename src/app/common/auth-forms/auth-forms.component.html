@@ -56,7 +56,7 @@
     *ngIf="loginFormMode === 'register'"
     class="d-flex flex-column align-items-center"
   >
-    <div>Register Form</div>
+    <h4 class="text-center">Register Form</h4>
     <form
       [formGroup]="registerForm"
       (ngSubmit)="register()"
@@ -111,7 +111,7 @@
           </div>
         </div>
       </div>
-      <button type="submit" [disabled]="registerForm.invalid">Register</button>
+      <button type="submit" class="btn" [disabled]="registerForm.invalid">Register</button>
     </form>
     <button
       type="button"
@@ -123,9 +123,9 @@
   </div>
   <div
     *ngIf="loginFormMode === 'login'"
-    [class]="isInTopBar? 'd-flex flex-row justify-content-around align-items-center' : 'd-flex flex-column align-items-center'"
+    class="'d-flex flex-column align-items-center"
   >
-    <div *ngIf="!isInTopBar">Login Form</div>
+    <h4 class="text-center">Login Form</h4>
     <form
       [formGroup]="loginForm"
       (ngSubmit)="login()"
@@ -173,9 +173,9 @@
         </div>
       </div>
       <button type="submit" class="btn" [disabled]="loginForm.invalid" (click)="login()">Login</button>
+      <button type="button" class="switch-button" (click)="toggleLoginFormMode('register')">
+        Not registered yet? Register here!
+      </button>
     </form>
-    <button class="switch-button" (click)="toggleLoginFormMode('register')">
-      Not registered yet? Register here!
-    </button>
   </div>
 </ng-template>

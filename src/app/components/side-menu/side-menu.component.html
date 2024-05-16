@@ -1,0 +1,4 @@
+<h3>Main Menu</h3>
+<div *ngFor="let menuItem of menuItems" class="d-flex flex-column align-items-start justify-content-around">
+    <a [routerLink]="menuItem.url">{{ menuItem.label }}</a>
+  </div>

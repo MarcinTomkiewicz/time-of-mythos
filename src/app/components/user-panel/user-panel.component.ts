@@ -1,55 +1,28 @@
 import { NgIf } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth-service';
+import { AuthFormsComponent } from '../../common/auth-forms/auth-forms.component';
 
 @Component({
   selector: 'app-user-panel',
   standalone: true,
-  imports: [NgIf, ReactiveFormsModule],
+  imports: [NgIf, AuthFormsComponent],
   templateUrl: './user-panel.component.html',
   styleUrls: ['./user-panel.component.css'],
 })
-export class UserPanelComponent implements OnInit {
+export class UserPanelComponent implements OnInit{
   isLoggedIn: boolean = false;
-  loginFormMode: 'login' | 'register' = 'login';
-  registerForm: FormGroup;
-  loginForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder, private authService: AuthService) {
-    this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
-    this.registerForm = this.formBuilder.group({
-      characterName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
-  }
+  constructor(private authService: AuthService) 
+  {}
 
   ngOnInit(): void {
-    this.isLoggedIn = this.authService.isLoggedIn();
+    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) => {
+      this.isLoggedIn = isLoggedIn; // Aktualizacja zmiennej isLoggedIn w komponencie
+    });
   }
 
-  register() {
-    if (this.registerForm.valid) {
-      console.log(this.registerForm.value); // Tutaj możesz wykonać logikę rejestracji, np. wysłanie danych na serwer
-    }
-  }
-  
-  login() {
-    if (this.loginForm.valid) {
-      console.log(this.loginForm.value); // Tutaj możesz wykonać logikę logowania, np. wysłanie danych na serwer
-    }
-  }
-
-  toggleLoginFormMode(mode: 'login' | 'register') {
-    this.loginFormMode = mode;
+  logout() {
+    this.authService.logOut();
   }
 }

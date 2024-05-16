@@ -27,6 +27,7 @@
 .menu-wrapper {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   flex-direction: row;
   background-color: rgba(127, 191, 255, 0.8);
   border: 1px solid #ccc;

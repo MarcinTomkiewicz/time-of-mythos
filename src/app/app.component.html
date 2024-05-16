@@ -7,8 +7,13 @@
     />
   </div>
   <div class="menu-wrapper">
-      <app-top-menu class="menu"></app-top-menu>
-    <div class="login-form">Formularz logowania</div>
+    <app-top-menu class="menu"></app-top-menu>
+    <ng-container *ngIf="!isLoggedIn; else loggedInTemplate">
+      <app-auth-forms [isInTopBar]="true"></app-auth-forms>
+    </ng-container>
+    <ng-template #loggedInTemplate>
+      <div>Hello, user</div>
+    </ng-template>
   </div>
 
   <div class="inner-wrapper">

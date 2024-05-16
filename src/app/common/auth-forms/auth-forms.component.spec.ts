@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TopMenuComponent } from './top-menu.component';
+import { AuthFormsComponent } from './auth-forms.component';
 
-describe('TopMenuComponent', () => {
-  let component: TopMenuComponent;
-  let fixture: ComponentFixture<TopMenuComponent>;
+describe('AuthFormsComponent', () => {
+  let component: AuthFormsComponent;
+  let fixture: ComponentFixture<AuthFormsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TopMenuComponent]
+      imports: [AuthFormsComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(TopMenuComponent);
+    fixture = TestBed.createComponent(AuthFormsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

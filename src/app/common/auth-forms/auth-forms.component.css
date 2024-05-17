@@ -5,6 +5,8 @@ h4 {
   padding-top: 10px;
   padding-bottom: 10px;
   text-transform: uppercase;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
 }
 
 .switch-button {

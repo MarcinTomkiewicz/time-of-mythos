@@ -4,6 +4,7 @@ import { AuthService } from './auth-service';
 import { IMenuItems } from '../interfaces/i-menu';
 import { switchMap } from 'rxjs/operators'; // Importuje switchMap
 import { Router } from '@angular/router';
+import { IUser } from '../interfaces/i-user';
 
 @Injectable({
   providedIn: 'root',
@@ -11,10 +12,12 @@ import { Router } from '@angular/router';
 export class MenuService {
   constructor(private authService: AuthService, private router: Router) {}
 
+
+  
   getMenuItems(): Observable<IMenuItems[]> {
     return this.authService.loggedIn$.pipe(
-      switchMap((isLoggedIn: boolean) => {
-        if (isLoggedIn) {
+      switchMap((loggedIn: boolean) => {
+        if (loggedIn) {
           const gameRoutes: IMenuItems[] = [
             { label: 'Dashboard', url: '/dashboard' },
             { label: 'Settings', url: '/settings' },

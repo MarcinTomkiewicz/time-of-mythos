@@ -2,6 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth-service';
 import { AuthFormsComponent } from '../../common/auth-forms/auth-forms.component';
+import { IUser } from '../../interfaces/i-user';
 
 @Component({
   selector: 'app-user-panel',
@@ -17,12 +18,12 @@ export class UserPanelComponent implements OnInit{
   {}
 
   ngOnInit(): void {
-    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) => {
-      this.isLoggedIn = isLoggedIn; // Aktualizacja zmiennej isLoggedIn w komponencie
-    });
+    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) =>{
+        this.isLoggedIn = isLoggedIn;
+      })
   }
 
   logout() {
-    this.authService.logOut();
+    this.authService.logoutUser();
   }
 }

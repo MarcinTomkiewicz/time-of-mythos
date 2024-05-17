@@ -1,6 +1,6 @@
 <div *ngIf="isLoggedIn; else notLoggedIn">
   <!-- Komponent dla zalogowanego użytkownika -->
-  <p>Welcome, user!</p>
+  <p>Welcome, {{ user?.name }}!</p>
   <button type="submit" class="btn" (click)="logout()">Log out</button>
 </div>
 

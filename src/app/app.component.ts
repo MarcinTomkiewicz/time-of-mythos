@@ -8,6 +8,7 @@ import { AuthService } from './services/auth-service';
 import { MainContentComponent } from './components/main-content/main-content.component';
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
 import { IUser } from './interfaces/i-user';
+import { User } from 'firebase/auth';
 
 @Component({
   selector: 'app-root',
@@ -23,20 +24,26 @@ import { IUser } from './interfaces/i-user';
     MainContentComponent,
     SideMenuComponent,
   ],
-  providers: [
-    AuthService
-  ]
+  providers: [AuthService],
 })
 export class AppComponent {
   title = 'Time of Mythos - Embark on an Epic Journey Through Ancient Greece!';
   isLoggedIn: boolean = false;
-  user!: IUser;
+  user: IUser | null = null;
 
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) =>{
+      this.authService.getUser().subscribe((user: IUser | null) => {
+        this.user = user;
+      });
+
+    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) => {
       this.isLoggedIn = isLoggedIn;
-    })
+    });
+  }
+
+  logout() {
+    this.authService.logoutUser();
   }
 }

@@ -12,7 +12,10 @@
       <app-auth-forms [isInTopBar]="true"></app-auth-forms>
     </ng-container>
     <ng-template #loggedInTemplate>
-      <div>Hello, user</div>
+      <div class="d-flex flex-row align-items-center gap-2">
+        <div>Hello, {{user?.name}} </div>
+        <button type="submit" class="btn" (click)="logout()">Log out</button>
+      </div>
     </ng-template>
   </div>
 

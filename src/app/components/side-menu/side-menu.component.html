@@ -1,4 +1,9 @@
-<h3>Main Menu</h3>
-<div *ngFor="let menuItem of menuItems" class="d-flex flex-column align-items-start justify-content-around">
+<div class="pb-2">
+  <h4>Main Menu</h4>
+  <div
+    *ngFor="let menuItem of menuItems"
+    class="d-flex flex-column align-items-start justify-content-around px-3 pb-1"
+  >
     <a [routerLink]="menuItem.url">{{ menuItem.label }}</a>
   </div>
+</div>

@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth-service';
 import { AuthFormsComponent } from '../../common/auth-forms/auth-forms.component';
 import { IUser } from '../../interfaces/i-user';
+import { User } from 'firebase/auth';
 
 @Component({
   selector: 'app-user-panel',
@@ -11,16 +12,20 @@ import { IUser } from '../../interfaces/i-user';
   templateUrl: './user-panel.component.html',
   styleUrls: ['./user-panel.component.css'],
 })
-export class UserPanelComponent implements OnInit{
+export class UserPanelComponent implements OnInit {
   isLoggedIn: boolean = false;
+  user!: IUser | null;
 
-  constructor(private authService: AuthService) 
-  {}
+  constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) =>{
-        this.isLoggedIn = isLoggedIn;
-      })
+    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) => {
+      this.isLoggedIn = isLoggedIn;
+    });
+
+      this.authService.getUser().subscribe((user: IUser | null) => {
+        this.user = user;
+      });
   }
 
   logout() {

@@ -7,7 +7,7 @@ import { AuthFormsComponent } from './common/auth-forms/auth-forms.component';
 import { AuthService } from './services/auth-service';
 import { MainContentComponent } from './components/main-content/main-content.component';
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
-import { IUser } from './interfaces/i-user';
+import { IUser } from './interfaces/general/i-user';
 import { User } from 'firebase/auth';
 
 @Component({

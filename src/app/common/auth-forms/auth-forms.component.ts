@@ -8,6 +8,8 @@ import {
 } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router';
+import { FormsService } from '../../services/forms-service';
 
 @Component({
   selector: 'app-auth-forms',
@@ -26,7 +28,9 @@ export class AuthFormsComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
+    public formsService: FormsService,
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -47,12 +51,17 @@ export class AuthFormsComponent implements OnInit {
 
   register() {
     if (this.registerForm.valid) {
-      this.authService.registerUser(
-        this.registerForm.value.email,
-        this.registerForm.value.password,
-        this.registerForm.value.characterName
-      );
-      this.registerForm.reset(); // Tutaj możesz wykonać logikę rejestracji, np. wysłanie danych na serwer
+      // this.authService.registerUser(
+      //   this.registerForm.value.email,
+      //   this.registerForm.value.password,
+      //   this.registerForm.value.characterName
+      // );
+
+      // Zapisz dane formularza w serwisie
+      this.formsService.setFormData(this.registerForm.value);
+
+      // Nawiguj do CreateCharacterComponent
+      this.router.navigate(['/start-journey']);
     }
   }
 
@@ -74,20 +83,32 @@ export class AuthFormsComponent implements OnInit {
     this.loginFormMode = mode;
   }
 
-  getErrorMessage(controlName: string, type: string): string {
-    const control = type === 'register' ? this.registerForm.get(controlName) : this.loginForm.get(controlName);
-    if (control && control.invalid && control.touched) {
-      if (control.hasError('required')) {
-        return 'This field is required';
-      } else if (control.hasError('email')) {
-        return 'Invalid email format';
-      } else if (control.hasError('minlength') && controlName === 'password') {
-        return 'Password must be at least 6 characters long';
-      }
-      else if (control.hasError('minlength') && controlName === 'characterName') {
-        return 'Character name must be at least 4 characters long.';
-      }
-    }
-    return '';
-  }
+  // getErrorMessage(controlName: string, type: string): string {
+  //   let control;
+  //   switch (type) {
+  //     case 'register':
+  //       control = this.registerForm.get(controlName);
+  //       break;
+  //     case 'login':
+  //       control = this.loginForm.get(controlName);
+  //       break;
+  //       case 'character':
+  //       control = this.characterForm.get(controlName);
+  //     default:
+  //       break;
+  //   }
+  //   if (control && control.invalid && control.touched) {
+  //     if (control.hasError('required')) {
+  //       return 'This field is required';
+  //     } else if (control.hasError('email')) {
+  //       return 'Invalid email format';
+  //     } else if (control.hasError('minlength') && controlName === 'password') {
+  //       return 'Password must be at least 6 characters long';
+  //     }
+  //     else if (control.hasError('minlength') && controlName === 'characterName') {
+  //       return 'Character name must be at least 4 characters long.';
+  //     }
+  //   }
+  //   return '';
+  // }
 }

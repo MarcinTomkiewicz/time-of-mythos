@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MainContentComponent } from './components/main-content/main-content.component';
+import { CreateCharacterComponent } from './components/create-character/create-character.component';
 
 const gameRoutes: Routes = [
   { path: 'dashboard', component: MainContentComponent },
@@ -15,7 +16,7 @@ const gameRoutes: Routes = [
 const homeRoutes: Routes = [
   { path: '', component: MainContentComponent },
   { path: 'about', component: MainContentComponent },
-  { path: 'start', component: MainContentComponent },
+  { path: 'start-journey' , component: CreateCharacterComponent },
   { path: 'story', component: MainContentComponent },
   { path: 'forum', component: MainContentComponent },
   { path: 'credits', component: MainContentComponent },

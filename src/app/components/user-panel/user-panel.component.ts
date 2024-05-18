@@ -2,7 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth-service';
 import { AuthFormsComponent } from '../../common/auth-forms/auth-forms.component';
-import { IUser } from '../../interfaces/i-user';
+import { IUser } from '../../interfaces/general/i-user';
 import { User } from 'firebase/auth';
 
 @Component({

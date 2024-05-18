@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { AuthService } from './auth-service';
-import { IMenuItems } from '../interfaces/i-menu';
+import { IMenuItems } from '../interfaces/general/i-menu';
 import { switchMap } from 'rxjs/operators'; // Importuje switchMap
 import { Router } from '@angular/router';
-import { IUser } from '../interfaces/i-user';
+import { IUser } from '../interfaces/general/i-user';
 
 @Injectable({
   providedIn: 'root',
@@ -37,7 +37,7 @@ export class MenuService {
           const homeRoutes: IMenuItems[] = [
             { label: 'Home', url: '/' },
             { label: 'About', url: '/about' },
-            { label: 'Get started', url: '/start' },
+            { label: 'Get started', url: '/start-journey' },
             { label: 'Story', url: '/story' },
             { label: 'Forum', url: '/forum' },
             { label: 'Credits', url: '/credits' },

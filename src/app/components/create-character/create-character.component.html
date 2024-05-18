@@ -1,0 +1,88 @@
+<div class="d-flex flex-column w-100 pb-3">
+  <div class="d-flex flex-column align-items-center gap-2">
+    <h4 class="text-center">Create a hero!</h4>
+    <form
+      [formGroup]="characterForm"
+      (ngSubmit)="register()"
+      class="d-flex flex-column align-items-center"
+      style="gap: 5px"
+    >
+      <div class="d-flex flex-column">
+        <label for="characterName">Character name:</label>
+        <input
+          type="text"
+          id="characterName"
+          formControlName="characterName"
+          [class.is-invalid]="
+            characterForm.get('characterName')?.invalid &&
+            characterForm.get('characterName')?.touched
+          "
+        />
+      </div>
+      <div
+        class="invalid-feedback text-center"
+        *ngIf="
+          characterForm.get('characterName')?.invalid &&
+          characterForm.get('characterName')?.touched
+        "
+      >
+        {{
+          formsService.getErrorMessage(
+            characterForm.get("characterName"),
+            "characterName"
+          )
+        }}
+      </div>
+      <div class="d-flex flex-column">
+        <label for="email">Email address:</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          [class.is-invalid]="
+            characterForm.get('email')?.invalid &&
+            characterForm.get('email')?.touched
+          "
+        />
+      </div>
+      <div
+        class="invalid-feedback text-center"
+        *ngIf="
+          characterForm.get('email')?.invalid &&
+          characterForm.get('email')?.touched
+        "
+      >
+        {{ formsService.getErrorMessage(characterForm.get("email"), "email") }}
+      </div>
+      <div class="d-flex flex-column">
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          [class.is-invalid]="
+            characterForm.get('password')?.invalid &&
+            characterForm.get('password')?.touched
+          "
+        />
+      </div>
+      <div
+        class="invalid-feedback text-center"
+        *ngIf="
+          characterForm.get('password')?.invalid &&
+          characterForm.get('password')?.touched
+        "
+      >
+        {{
+          formsService.getErrorMessage(
+            characterForm.get("password"),
+            "password"
+          )
+        }}
+      </div>
+      <button type="submit" class="btn" [disabled]="characterForm.invalid">
+        Start journey!
+      </button>
+    </form>
+  </div>
+</div>

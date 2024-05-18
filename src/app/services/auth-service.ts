@@ -11,11 +11,9 @@ import {
   doc,
   setDoc,
   getDoc,
-  DocumentSnapshot,
 } from '@angular/fire/firestore';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { IUser } from '../interfaces/i-user';
+import { BehaviorSubject, from, Observable } from 'rxjs';
+import { IUser } from '../interfaces/general/i-user';
 
 @Injectable({
   providedIn: 'root',

@@ -1,6 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { IMenuItems } from '../../interfaces/i-menu';
+import { IMenuItems } from '../../interfaces/general/i-menu';
 import { MenuService } from '../../services/menu-service';
 import { RouterLink } from '@angular/router';
 
@@ -12,6 +12,7 @@ import { RouterLink } from '@angular/router';
   styleUrl: './side-menu.component.css'
 })
 export class SideMenuComponent implements OnInit {
+  loading: boolean = true;
 
   menuItems?: IMenuItems[];
 
@@ -20,6 +21,7 @@ export class SideMenuComponent implements OnInit {
   ngOnInit(): void {
     this.menuService.getMenuItems().subscribe(menuItems => {
       this.menuItems = menuItems;
+      this.loading = false;
     });
   }
 }

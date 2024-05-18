@@ -1,6 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { IMenuItems } from '../../interfaces/i-menu';
+import { IMenuItems } from '../../interfaces/general/i-menu';
 import { MenuService } from '../../services/menu-service';
 import { RouterLink } from '@angular/router';
 

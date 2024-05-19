@@ -3,7 +3,7 @@ export interface IOriginBonus {
   }
 
 export interface IOriginsDefinition {
-    originId: number;
+    id: number;
     originBonus:IOriginBonus;
     originImg: string;
 }

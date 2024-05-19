@@ -13,30 +13,30 @@ import { DataProcessingService } from './data-processing-service';
 export class FirestoreService {
   constructor(private firestore: Firestore, private dataProcessingService: DataProcessingService) {}
 
-  getOriginsDefinitions(): Observable<{ [key: string]: IOriginsDefinition }> {
-    return new Observable<{ [key: string]: IOriginsDefinition }>((observer) => {
-      const originsDefinitionDocumentRef = doc(
-        this.firestore,
-        'definitions/origins'
-      );
+  // getOriginsDefinitions(): Observable<{ [key: string]: IOriginsDefinition }> {
+  //   return new Observable<{ [key: string]: IOriginsDefinition }>((observer) => {
+  //     const originsDefinitionDocumentRef = doc(
+  //       this.firestore,
+  //       'definitions/origins'
+  //     );
 
-      getDoc(originsDefinitionDocumentRef)
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const originsData = snapshot.data() as {
-              [key: string]: IOriginsDefinition;
-            };
-            observer.next(originsData);
-          }
-        })
-        .catch((error) => {
-          observer.error(error);
-        });
-    });
-  }
+  //     getDoc(originsDefinitionDocumentRef)
+  //       .then((snapshot) => {
+  //         if (snapshot.exists()) {
+  //           const originsData = snapshot.data() as {
+  //             [key: string]: IOriginsDefinition;
+  //           };
+  //           observer.next(originsData);
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         observer.error(error);
+  //       });
+  //   });
+  // }
 
   getDefinitions(collectionPath: string, idKey: string): Observable<{ [key: string]: any }> {
-    return new Observable<{ [key: string]: any }>((observer) => {
+    return new Observable<{ [key: string]: any }>((observer) => {      
       const definitionsDocumentRef = doc(
         this.firestore,
         collectionPath

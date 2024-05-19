@@ -1,0 +1,84 @@
+<div class="my-carousel-wrapper">
+  <button class="prev" (click)="prev()">❮</button>
+  <div class="carousel-content">
+    <div class="carousel-images">
+      <div
+        class="carousel-image"
+        *ngFor="let origin of originsToDisplay; let i = index"
+        [class.center]="i === currentIndex"
+        [class.left]="i === getLeftIndex()"
+        [class.right]="i === getRightIndex()"
+        [class.hidden]="!isVisible(i)"
+      >
+        <img
+          [src]="originsDefinition[origin]?.originImg"
+          alt="{{ originsMetadata[origin]?.displayName }}"
+        />
+      </div>
+    </div>
+    <div class="origin-info">
+      <h2 class="text-center">
+        {{ originsMetadata[originsToDisplay[currentIndex]]?.displayName }}
+      </h2>
+      <div>
+        {{ originsMetadata[originsToDisplay[currentIndex]]?.description }}
+      </div>
+      <div class="d-flex flex-row gap-1">
+        Bonuses:
+        <div *ngFor="let bonus of getOriginBonus(); let i = index; let last = last" class="d-flex flex-row">
+          <div>
+            <span style="font-weight: bold">{{ bonus.stat }}</span>: {{ bonus.bonus > 0 ? '+' + bonus.bonus : '-' + bonus.bonus }}<ng-container *ngIf="!last">,</ng-container>
+            <ng-container *ngIf="last">.</ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="next" (click)="next()">❯</button>
+</div>
+
+<!-- <div class="my-carousel-wrapper" (slide)="onSlideChange()"  >
+  <button class="prev" (click)="prev()">❮</button>
+  <div class="my-origin-info">
+    <h2>{{ originsMetadata[originsToDisplay[currentIndex]]?.displayName }}</h2>
+    <div>
+      {{ originsMetadata[originsToDisplay[currentIndex]]?.description }}
+    </div>
+    <img
+      [src]="originsDefinition[originsToDisplay[currentIndex]]?.originImg"
+      alt="{{ originsMetadata[originsToDisplay[currentIndex]]?.displayName }}"
+      style="width: 20%"
+    />
+    <p>Bonusy:</p>
+    <ul>
+      <li *ngFor="let bonus of getOriginBonus()">
+        {{ bonus.stat }}: {{ bonus.bonus }}
+      </li>
+    </ul>
+  </div>
+  <button class="next" (click)="next()">❯</button>
+  {{ originsDefinition[currentIndex] }}
+</div> -->
+
+<!-- <ngb-carousel>
+    <ng-template>
+      
+        <div class="origin-info">
+          
+          <h2>{{ originsMetadata[originsToDisplay[currentIndex]]?.displayName }}</h2>
+          <div>{{ originsMetadata[originsToDisplay[currentIndex]]?.description }}</div>
+          <img
+            [src]="originsDefinition[originsToDisplay[currentIndex]]?.originImg"
+            alt="{{ originsMetadata[originsToDisplay[currentIndex]]?.displayName }}"
+            style="width: 20%"
+          />
+          <p>Bonusy:</p>
+          <ul>
+            <li *ngFor="let bonus of getOriginBonus()">
+              {{ bonus.stat }}: {{ bonus.bonus }}
+            </li>
+          </ul>
+        </div>
+      
+    </ng-template>
+  </ngb-carousel> -->

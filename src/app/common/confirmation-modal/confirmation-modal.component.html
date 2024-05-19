@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h4 class="modal-title text-uppercase">Confirm your choice!</h4>
+</div>
+<div class="modal-body">
+  <div class="d-flex flex-column">
+    <div>{{ confirmationQuestion }}</div> 
+    <div>Selected origin: {{ selectedOption }}</div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn" (click)="proceed()">Proceed</button>
+  <button type="button" class="btn" (click)="cancel()">Cancel</button>
+</div>

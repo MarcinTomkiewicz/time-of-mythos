@@ -1,5 +1,4 @@
 export interface IUser {
-  id?: number;
   isAdmin: boolean;
   isOnline: boolean;
   name: string;

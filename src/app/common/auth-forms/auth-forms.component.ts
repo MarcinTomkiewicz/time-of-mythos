@@ -29,6 +29,7 @@ export class AuthFormsComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    // private firestore: AngularFire,
     private router: Router,
     public formsService: FormsService,
   ) {

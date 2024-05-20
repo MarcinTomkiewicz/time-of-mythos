@@ -9,7 +9,7 @@
   <div class="menu-wrapper">
     <app-top-menu class="menu"></app-top-menu>
     <ng-container *ngIf="!isLoggedIn; else loggedInTemplate">
-      <app-auth-forms [isInTopBar]="true"></app-auth-forms>
+      <app-auth-forms [isInTopBar]="true" [emailId]="'emailTop'" [passwordId]="'passwordTop'"></app-auth-forms>
     </ng-container>
     <ng-template #loggedInTemplate>
       <div class="d-flex flex-row align-items-center gap-2">

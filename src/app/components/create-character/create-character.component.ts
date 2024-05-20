@@ -18,11 +18,12 @@ import { IUser } from '../../interfaces/general/i-user';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalComponent } from '../../common/confirmation-modal/confirmation-modal.component';
 import { IAttributesDefinition } from '../../interfaces/definitions/i-attributes';
+import { AttributesPanelComponent } from '../attributes-panel/attributes-panel.component';
 
 @Component({
   selector: 'app-create-character',
   standalone: true,
-  imports: [NgIf, ReactiveFormsModule, NgFor, CarouselComponent],
+  imports: [NgIf, ReactiveFormsModule, NgFor, CarouselComponent, AttributesPanelComponent],
   templateUrl: './create-character.component.html',
   styleUrl: './create-character.component.css',
 })
@@ -84,8 +85,6 @@ export class CreateCharacterComponent {
       this.firestoreService.getDefinitions('definitions/attributes', 'id').subscribe((attributesDefinition) => {
         this.attributesDefinitions = attributesDefinition;
         this.attributesToDisplay = Object.keys(this.attributesDefinitions)
-        console.log(this.attributesDefinitions, this.attributesToDisplay);
-        
       })
 
     this.firestoreService
@@ -177,8 +176,6 @@ export class CreateCharacterComponent {
   }
 
   getImageUrl(imagePath: string): string {
-    console.log(imagePath);
-
     const baseUrl =
       'https://firebasestorage.googleapis.com/v0/b/time-of-mythos.appspot.com/o/';
     const encodedPath = encodeURIComponent(imagePath);

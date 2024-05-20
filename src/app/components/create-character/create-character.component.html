@@ -16,6 +16,14 @@
       </button>
     </div>
     <div *ngIf="originChosen">
+    <app-attributes-panel
+    [newHeroData]="newHeroData"
+    [newHeroStats]="newHeroStats"
+    [attributesDefinitions]="attributesDefinitions"
+    [attributesMetadata]="attributesMetadata"
+    [heroDataMetadata]="heroDataMetadata"
+    [attributesToDisplay]="attributesToDisplay">
+  </app-attributes-panel>
       <form
         [formGroup]="characterForm"
         (ngSubmit)="register()"

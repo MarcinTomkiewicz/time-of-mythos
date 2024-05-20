@@ -20,6 +20,8 @@ import { FormsService } from '../../services/forms-service';
 })
 export class AuthFormsComponent implements OnInit {
   @Input() isInTopBar: boolean = false;
+  @Input() emailId: string = '';
+  @Input() passwordId: string = '';
 
   isLoggedIn: boolean = false;
   loginFormMode: 'login' | 'register' = 'register';

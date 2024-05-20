@@ -12,10 +12,12 @@
     <div class="d-flex flex-column position-relative">
       <input
         type="email"
-        id="email"
+        [id]="emailId"
         formControlName="email"
         placeholder="Email address"
-        [ngbTooltip]="formsService.getErrorMessage(loginForm.get('email'), ('email'))"
+        [ngbTooltip]="
+          formsService.getErrorMessage(loginForm.get('email'), 'email')
+        "
         [placement]="'bottom'"
         [class.is-invalid]="
           loginForm.get('email')?.invalid && loginForm.get('email')?.touched
@@ -25,10 +27,12 @@
     <div class="d-flex flex-column position-relative">
       <input
         type="password"
-        id="password"
+        [id]="passwordId"
         formControlName="password"
         placeholder="Password"
-        [ngbTooltip]="formsService.getErrorMessage(loginForm.get('password'), 'password')"
+        [ngbTooltip]="
+          formsService.getErrorMessage(loginForm.get('password'), 'password')
+        "
         [placement]="'bottom'"
         [class.is-invalid]="
           loginForm.get('password')?.invalid &&
@@ -82,10 +86,10 @@
           }}
         </div>
         <div class="d-flex flex-column">
-          <label for="email">Email address:</label>
+          <label [for]="emailId">Email address:</label>
           <input
             type="email"
-            id="email"
+            [id]="emailId"
             formControlName="email"
             [class.is-invalid]="
               registerForm.get('email')?.invalid &&
@@ -103,10 +107,10 @@
           {{ formsService.getErrorMessage(registerForm.get("email"), "email") }}
         </div>
         <div class="d-flex flex-column">
-          <label for="password">Password:</label>
+          <label [for]="passwordId">Password:</label>
           <input
             type="password"
-            id="password"
+            [id]="passwordId"
             formControlName="password"
             [class.is-invalid]="
               registerForm.get('password')?.invalid &&
@@ -153,10 +157,10 @@
         style="gap: 5px"
       >
         <div class="d-flex flex-column">
-          <label for="email">Email address:</label>
+          <label [for]="emailId">Email address:</label>
           <input
             type="email"
-            id="email"
+            [id]="emailId"
             formControlName="email"
             [class.is-invalid]="
               loginForm.get('email')?.invalid && loginForm.get('email')?.touched
@@ -172,10 +176,10 @@
           {{ formsService.getErrorMessage(loginForm.get("email"), "email") }}
         </div>
         <div class="d-flex flex-column">
-          <label for="password">Password:</label>
+          <label [for]="passwordId">Password:</label>
           <input
             type="password"
-            id="password"
+            [id]="passwordId"
             formControlName="password"
             [class.is-invalid]="
               loginForm.get('password')?.invalid &&

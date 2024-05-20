@@ -1,0 +1,28 @@
+<div class="attributes-panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Nazwa cechy</th>
+          <th>Aktualna wartość</th>
+          <th>Koszt zwiększenia</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let attribute of attributesToDisplay">
+          <td [title]="attributesMetadata[attribute].description">
+            {{ attributesMetadata[attribute].displayName }}
+          </td>
+          <td>{{ getAttributeValue(attribute) }} </td>
+          <td>1</td>
+          <td>
+            <button (click)="decreaseAttribute(attribute)">-</button>
+            <button (click)="increaseAttribute(attribute)">+</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+<div>{{ heroData.level }}</div>
+<div>{{ heroData.dpPoints }}</div>

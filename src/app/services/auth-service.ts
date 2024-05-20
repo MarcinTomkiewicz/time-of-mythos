@@ -92,6 +92,10 @@ export class AuthService {
     });
   }
 
+  getUserUID(): string | null {
+    return this.currentUser ? this.currentUser.uid : null;
+  }
+
   isLoggedIn(): boolean {
     return this.loggedInSubject.value;
   }

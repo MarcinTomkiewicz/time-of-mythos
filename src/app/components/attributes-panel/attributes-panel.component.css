@@ -1,0 +1,40 @@
+.attributes-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th {
+    text-align: left;
+    padding: 8px;
+  }
+  
+  td {
+    padding: 8px;
+  }
+  
+  .hero-info {
+    margin-bottom: 10px;
+  }
+  
+  .attribute-name,
+  .attribute-value,
+  .increase-cost,
+  .actions {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .btn {
+    min-width: 40px!important;
+  }
+  
+  .attribute-name {
+    width: 60%; /* Szerokość kolumny "Attribute Name" */
+  }

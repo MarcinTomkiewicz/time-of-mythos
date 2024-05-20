@@ -1,28 +1,29 @@
 <div class="attributes-panel">
+    <div class="hero-info">
+      <div>Current Level: {{ heroData.level }}</div>
+      <div>Current DP (Development Points): {{ heroData.dpPoints }}</div>
+    </div>
     <table>
       <thead>
         <tr>
-          <th>Nazwa cechy</th>
-          <th>Aktualna wartość</th>
-          <th>Koszt zwiększenia</th>
-          <th>Akcje</th>
+          <th class="attribute-name">Attribute Name</th>
+          <th class="attribute-value">Current Value</th>
+          <th class="increase-cost">Increase Cost</th>
+          <th class="actions">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let attribute of attributesToDisplay">
-          <td [title]="attributesMetadata[attribute].description">
-            {{ attributesMetadata[attribute].displayName }}
+          <td class="d-flex flex-row gap-1">
+            <span>{{ attributesMetadata[attribute].displayName }}</span><span class="bi bi-question-diamond" style="cursor: pointer;" [ngbTooltip]="attributesMetadata[attribute].description" placement="top-left" container="body" triggers="click"></span>
           </td>
-          <td>{{ getAttributeValue(attribute) }} </td>
-          <td>1</td>
-          <td>
-            <button (click)="decreaseAttribute(attribute)">-</button>
-            <button (click)="increaseAttribute(attribute)">+</button>
+          <td class="attribute-value">{{ getAttributeValue(attribute) }}</td>
+          <td class="increase-cost">{{ calculateCostForAttribute(getAttributeValue(attribute)) }}</td>
+          <td class="actions">
+            <button class="btn" (click)="decreaseAttribute(attribute)">-</button>
+            <button class="btn" (click)="increaseAttribute(attribute)">+</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
-
-<div>{{ heroData.level }}</div>
-<div>{{ heroData.dpPoints }}</div>

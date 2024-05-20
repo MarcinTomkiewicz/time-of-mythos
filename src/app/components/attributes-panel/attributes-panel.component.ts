@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { IHeroData } from '../../interfaces/hero/i-hero-data';
 import { IHeroStats } from '../../interfaces/hero/i-hero-stats';
 import { IAttributesDefinition } from '../../interfaces/definitions/i-attributes';
@@ -6,12 +6,14 @@ import { IMetadata } from '../../interfaces/metadata/i-metadata';
 import { FirestoreService } from '../../services/firestore-service';
 import { AuthService } from '../../services/auth-service';
 import { IUser } from '../../interfaces/general/i-user';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
+import { FormulasService } from '../../services/formulas-service';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-attributes-panel',
   standalone: true,
-  imports: [NgFor],
+  imports: [NgFor, NgIf, NgbTooltip],
   templateUrl: './attributes-panel.component.html',
   styleUrl: './attributes-panel.component.css',
 })
@@ -21,7 +23,7 @@ export class AttributesPanelComponent implements OnInit {
   @Input() attributesDefinitions!: { [key: string]: IAttributesDefinition };
   @Input() attributesMetadata!: { [key: string]: IMetadata };
   @Input() heroDataMetadata!: { [key: string]: IMetadata };
-  @Input() attributesToDisplay: string[] = []
+  @Input() attributesToDisplay: string[] = [];
 
   heroData!: IHeroData;
   heroStats!: IHeroStats;
@@ -32,19 +34,20 @@ export class AttributesPanelComponent implements OnInit {
 
   constructor(
     private firestoreService: FirestoreService,
-    private authService: AuthService
+    private authService: AuthService,
+    private formulasService: FormulasService
   ) {}
 
   ngOnInit(): void {
     this.userUid = this.authService.getUserUID();
-  
+
     this.authService.loggedIn$.subscribe((isLoggedIn: boolean) => {
       this.isLoggedIn = isLoggedIn;
     });
-  
+
     this.authService.getUser().subscribe((user: IUser | null) => {
       this.user = user;
-  
+
       if (this.userUid && this.user) {
         this.loadHeroData(this.userUid);
         this.loadAttributesData(this.userUid);
@@ -68,22 +71,36 @@ export class AttributesPanelComponent implements OnInit {
   }
 
   getAttributeValue(attribute: string): number {
-    return this.heroStats[attribute as keyof IHeroStats]
+    return this.heroStats[attribute as keyof IHeroStats];
+  }
+
+  calculateCostForAttribute(attributeLevel: number): number {   
+    return this.formulasService.calculateAttributeCost(attributeLevel);
   }
 
   increaseAttribute(attribute: string): void {
     if (this.heroStats[attribute as keyof IHeroStats] !== undefined) {
-      this.heroStats[attribute as keyof IHeroStats]++;
+      const increaseCost = this.calculateCostForAttribute(this.heroStats[attribute as keyof IHeroStats]);
+      if (this.heroData.dpPoints >= increaseCost) {
+        this.heroStats[attribute as keyof IHeroStats]++;
+        
+        
+        this.heroData.dpPoints -= increaseCost;
+      }
     }
   }
 
   decreaseAttribute(attribute: string): void {
     if (this.heroStats[attribute as keyof IHeroStats] !== undefined && this.heroStats[attribute as keyof IHeroStats] > 0) {
-      this.heroStats[attribute as keyof IHeroStats]--;
+      const increaseCost = this.calculateCostForAttribute(this.heroStats[attribute as keyof IHeroStats] - 1);
+      if (this.heroData.dpPoints + increaseCost <= this.newHeroData.dpPoints) {
+        this.heroStats[attribute as keyof IHeroStats]--;
+        this.heroData.dpPoints += increaseCost;
+      }
     }
   }
 
   log(data: any): void {
-    console.log(data)
+    console.log(data);
   }
 }

@@ -1,0 +1,11 @@
+img {
+    height: 400px; /* Adjust as needed */
+    width: auto; /* Maintain aspect ratio */
+  }
+
+  .origin-info {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }

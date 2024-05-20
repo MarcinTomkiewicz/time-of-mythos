@@ -6,7 +6,6 @@ export interface IUser {
   birthday?: Date;
   createdAt?: Date;
   updatedAt?: Date;
-  profilePictureUrl?: string;
   lastLogin?: Date;
   city?: string;
   socialLinks?: {

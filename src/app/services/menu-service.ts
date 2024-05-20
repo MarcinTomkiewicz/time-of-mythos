@@ -20,10 +20,11 @@ export class MenuService {
         if (loggedIn) {
           const gameRoutes: IMenuItems[] = [
             { label: 'Dashboard', url: '/dashboard' },
-            { label: 'Settings', url: '/settings' },
-            { label: 'Journey', url: '/journey' },
-            { label: 'Armory', url: '/armory' },
+            { label: 'Attributes', url: '/attributes' },
+            { label: 'Challenges', url: '/challenges' },
             { label: 'Combat', url: '/combat' },
+            { label: 'Armory', url: '/armory' },
+            { label: 'Mansion', url: '/mansion'},
             { label: 'Trade', url: '/trade' },
             { label: 'Forum', url: '/forum' },
           ];

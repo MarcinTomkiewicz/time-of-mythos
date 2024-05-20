@@ -2,13 +2,15 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MainContentComponent } from './components/main-content/main-content.component';
 import { CreateCharacterComponent } from './components/create-character/create-character.component';
+import { AttributesPanelComponent } from './components/attributes-panel/attributes-panel.component';
 
 const gameRoutes: Routes = [
   { path: 'dashboard', component: MainContentComponent },
-  { path: 'settings', component: MainContentComponent },
-  { path: 'journey', component: MainContentComponent },
-  { path: 'armory', component: MainContentComponent },
+  { path: 'attributes', component: AttributesPanelComponent },
+  { path: 'challenges', component: MainContentComponent },
   { path: 'combat', component: MainContentComponent },
+  { path: 'armory', component: MainContentComponent },
+  { path: 'mansion', component: MainContentComponent},
   { path: 'trade', component: MainContentComponent },
   { path: 'forum', component: MainContentComponent },
 ];

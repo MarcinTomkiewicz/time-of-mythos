@@ -29,15 +29,15 @@ export class CarouselComponent implements OnInit{
   constructor(private originService: OriginService) {}
 
   ngOnInit() {
-    this.preloadImages();
+  //   this.preloadImages();
   }
 
-  preloadImages() {
-    this.originsToDisplay.forEach((origin: string) => {
-      const img = new Image();
-      img.src = this.originsDefinition[origin]?.originImg;
-    });
-  }
+  // preloadImages() {
+  //   this.originsToDisplay.forEach((origin: string) => {
+  //     const img = new Image();
+  //     img.src = this.originsDefinition[origin]?.originImg;
+  //   });
+  // }
 
   getLeftIndex(): number {
     return (this.currentIndex + 1) % this.originsToDisplay.length;

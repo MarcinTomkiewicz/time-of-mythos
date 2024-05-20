@@ -50,7 +50,7 @@
   }
   
   .carousel-image.hidden {
-    transform: none;
+    transform: translateZ(50px) rotateY(180deg);
     opacity: 0;
     z-index: 0;
   }

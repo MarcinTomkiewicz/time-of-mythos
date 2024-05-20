@@ -3,7 +3,8 @@ export interface IHeroData {
     xpPoints: number;
     dpPoints: number;
     level: number;
-    originId: number;
+    originId: string;
+    rankId: string;
     hp: number;
     defense: number;
     luck: number;

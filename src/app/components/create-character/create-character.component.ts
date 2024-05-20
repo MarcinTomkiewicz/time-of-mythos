@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormsService } from '../../services/forms-service';
 import {
   FormBuilder,
@@ -23,9 +23,16 @@ import { AttributesPanelComponent } from '../attributes-panel/attributes-panel.c
 @Component({
   selector: 'app-create-character',
   standalone: true,
-  imports: [NgIf, ReactiveFormsModule, NgFor, CarouselComponent, AttributesPanelComponent],
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    NgFor,
+    CarouselComponent,
+    AttributesPanelComponent,
+  ],
   templateUrl: './create-character.component.html',
   styleUrl: './create-character.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class CreateCharacterComponent {
   formData: any;
@@ -41,7 +48,9 @@ export class CreateCharacterComponent {
   newHeroStats: IHeroStats;
   newUserData: IUser;
   originChosen: boolean = false;
+  nameChosen: boolean = false;
   currentIndex: number = 0;
+  selectedFile!: File;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -53,7 +62,16 @@ export class CreateCharacterComponent {
     this.characterForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      characterName: ['', [Validators.required, Validators.minLength(4)]],
+      characterName: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', Validators.required],
+      birthday: ['', Validators.required],
+      city: [''],
+      profilePicture: [null],
+      facebook: [''],
+      twitter: [''],
+      linkedIn: [''],
+      instagram: [''],
+      bio: [''],
     });
 
     this.newHeroData = this.initializeHeroData();
@@ -82,10 +100,12 @@ export class CreateCharacterComponent {
         }
       });
 
-      this.firestoreService.getDefinitions('definitions/attributes', 'id').subscribe((attributesDefinition) => {
+    this.firestoreService
+      .getDefinitions('definitions/attributes', 'id')
+      .subscribe((attributesDefinition) => {
         this.attributesDefinitions = attributesDefinition;
-        this.attributesToDisplay = Object.keys(this.attributesDefinitions)
-      })
+        this.attributesToDisplay = Object.keys(this.attributesDefinitions);
+      });
 
     this.firestoreService
       .getMetadata<IMetadata>('originsMetadata')
@@ -109,11 +129,12 @@ export class CreateCharacterComponent {
   initializeHeroData(): IHeroData {
     return {
       heroName: '',
-      xpPoints: 0,
+      xpPoints: 100,
       dpPoints: 100,
       level: 1,
-      originId: 0,
-      hp: 0,
+      originId: '',
+      rankId: 'perioecus',
+      hp: 1,
       defense: 0,
       luck: 0,
       allianceID: 0,
@@ -141,7 +162,6 @@ export class CreateCharacterComponent {
       birthday: new Date(0),
       createdAt: new Date(),
       updatedAt: new Date(),
-      profilePictureUrl: '',
       lastLogin: new Date(),
       city: '',
       socialLinks: {
@@ -188,7 +208,7 @@ export class CreateCharacterComponent {
 
   chooseOrigin() {
     const modalRef = this.modalService.open(ConfirmationModalComponent, {
-      centered: true
+      centered: true,
     });
     modalRef.componentInstance.confirmationQuestion =
       'Are you sure you want to choose this origin?';
@@ -199,16 +219,61 @@ export class CreateCharacterComponent {
       ].displayName;
     modalRef.result.then((result) => {
       if (result === 'proceed') {
-        this.newHeroData.originId = this.currentIndex + 1;
+        this.newHeroData.originId = this.originsToDisplay[this.currentIndex];
         this.originChosen = true;
       }
     });
   }
 
-  register(): void {
-    if (this.characterForm.valid) {
-      // Logika po zatwierdzeniu formularza
-      console.log('Formularz zatwierdzony:', this.characterForm.value);
+  chooseName() {
+    const modalRef = this.modalService.open(ConfirmationModalComponent, {
+      centered: true,
+    });
+    modalRef.componentInstance.confirmationQuestion =
+      'Are you sure you want to proceed with this name?';
+    modalRef.componentInstance.confirmationData = 'Chosen name: ';
+    modalRef.componentInstance.selectedOption =
+      this.characterForm.value.characterName;
+    modalRef.result.then((result) => {
+      if (result === 'proceed') {
+        this.newHeroData.heroName = this.characterForm.value.characterName;
+        this.nameChosen = true;
+      }
+    });
+  }
+
+  onFileSelect(event: any): void {
+    if (event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.characterForm.patchValue({
+          profilePicture: reader.result
+        });
+      };
+      reader.readAsDataURL(this.selectedFile);
     }
   }
-}
+
+  register(): void {
+    if (this.characterForm.valid) {
+      this.newUserData = {
+        ...this.newUserData,
+        email: this.characterForm.get('email')?.value,
+        name: this.characterForm.get('name')?.value,
+        birthday: this.characterForm.get('birthday')?.value,
+        city: this.characterForm.get('city')?.value,
+        createdAt: new Date(),
+        socialLinks: {
+          facebook: this.characterForm.get('facebook')?.value,
+          twitter: this.characterForm.get('twitter')?.value,
+          linkedIn: this.characterForm.get('linkedIn')?.value,
+          instagram: this.characterForm.get('instagram')?.value
+        },
+        bio: this.characterForm.get('bio')?.value
+      };
+    } 
+    console.log(this.newUserData, this.newHeroData, this.newHeroStats, this.selectedFile);
+    
+  }
+  }

@@ -19,6 +19,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalComponent } from '../../common/confirmation-modal/confirmation-modal.component';
 import { IAttributesDefinition } from '../../interfaces/definitions/i-attributes';
 import { AttributesPanelComponent } from '../attributes-panel/attributes-panel.component';
+import { IHeroBuildings } from '../../interfaces/hero/i-hero-buildings';
 
 @Component({
   selector: 'app-create-character',
@@ -46,6 +47,7 @@ export class CreateCharacterComponent {
   attributesToDisplay: string[] = [];
   newHeroData: IHeroData;
   newHeroStats: IHeroStats;
+  newHeroBuildings: IHeroBuildings;
   newUserData: IUser;
   originChosen: boolean = false;
   nameChosen: boolean = false;
@@ -76,6 +78,7 @@ export class CreateCharacterComponent {
 
     this.newHeroData = this.initializeHeroData();
     this.newHeroStats = this.initializeHeroStats();
+    this.newHeroBuildings = this.initializeHeroBuildings();
     this.newUserData = this.initializeUserData();
   }
 
@@ -133,7 +136,8 @@ export class CreateCharacterComponent {
       dpPoints: 100,
       level: 1,
       originId: '',
-      rankId: 'perioecus',
+      rankName: 'perioecus',
+      rankId: 1,
       hp: 1,
       defense: 0,
       luck: 0,
@@ -153,6 +157,32 @@ export class CreateCharacterComponent {
       spirituality: 1,
     };
   }
+
+  initializeHeroBuildings(): IHeroBuildings {
+    return {
+        agora: 1,
+        lumberMill: 1,
+        farm: 1,
+        tradeRoute: 1,
+        armory: 1,
+        barracks: 1,
+        fortress: 1,
+        argyroeides: 0,
+        quarry: 0,
+        oikia: 0,
+        oracle: 0,
+        temple: 0,
+        port: 0,
+        academy: 0,
+        gymnasium: 0,
+        fountain: 0,
+        altar: 0,
+        planningHall: 0,
+        chamber: 0,
+        royalPalace: 0,
+    }
+  }
+
   initializeUserData(): IUser {
     return {
       isAdmin: false,
@@ -273,7 +303,7 @@ export class CreateCharacterComponent {
         bio: this.characterForm.get('bio')?.value
       };
     } 
-    console.log(this.newUserData, this.newHeroData, this.newHeroStats, this.selectedFile);
+    console.log(this.newUserData, this.newHeroData, this.newHeroStats, this.selectedFile, this.newHeroBuildings);
     
   }
   }

@@ -1,6 +1,11 @@
+@import '@fontsource/eb-garamond/index.css';
+@import '@fontsource/cormorant-garamond/index.css';
+
 body {
-  font-size: 14px !important;
+  font-size: 16px !important;
   color: #464646 !important;
+  font-family: "Cormorant Garamond", serif!important;
+  font-optical-sizing: auto;
   box-sizing: border-box;
   --s: 100px; /* control the size */
   --c: #f5f5f5; /* first color */
@@ -39,7 +44,7 @@ body {
   text-decoration: none;
   color: #464646;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-  font-weight: 500 !important;
+  font-weight: bold !important;
   text-transform: uppercase;
   letter-spacing: 1px;
   position: relative;

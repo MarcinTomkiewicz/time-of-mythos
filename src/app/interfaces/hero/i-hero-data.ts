@@ -4,7 +4,8 @@ export interface IHeroData {
     dpPoints: number;
     level: number;
     originId: string;
-    rankId: string;
+    rankName: string;
+    rankId: number;
     hp: number;
     defense: number;
     luck: number;

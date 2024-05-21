@@ -20,6 +20,27 @@ import { ConfirmationModalComponent } from '../../common/confirmation-modal/conf
 import { IAttributesDefinition } from '../../interfaces/definitions/i-attributes';
 import { AttributesPanelComponent } from '../attributes-panel/attributes-panel.component';
 import { IHeroBuildings } from '../../interfaces/hero/i-hero-buildings';
+import {
+  FieldValue,
+  Firestore,
+  doc,
+  setDoc,
+  updateDoc,
+  writeBatch,
+} from '@angular/fire/firestore';
+import {
+  Auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from '@angular/fire/auth';
+import {
+  Storage,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from '@angular/fire/storage';
+import { Router } from '@angular/router';
+import { getDoc } from 'firebase/firestore';
 
 @Component({
   selector: 'app-create-character',
@@ -33,7 +54,7 @@ import { IHeroBuildings } from '../../interfaces/hero/i-hero-buildings';
   ],
   templateUrl: './create-character.component.html',
   styleUrl: './create-character.component.css',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class CreateCharacterComponent {
   formData: any;
@@ -59,7 +80,11 @@ export class CreateCharacterComponent {
     public formsService: FormsService,
     public firestoreService: FirestoreService,
     private originService: OriginService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private firestore: Firestore,
+    private auth: Auth,
+    private storage: Storage,
+    private router: Router
   ) {
     this.characterForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -160,27 +185,27 @@ export class CreateCharacterComponent {
 
   initializeHeroBuildings(): IHeroBuildings {
     return {
-        agora: 1,
-        lumberMill: 1,
-        farm: 1,
-        tradeRoute: 1,
-        armory: 1,
-        barracks: 1,
-        fortress: 1,
-        argyroeides: 0,
-        quarry: 0,
-        oikia: 0,
-        oracle: 0,
-        temple: 0,
-        port: 0,
-        academy: 0,
-        gymnasium: 0,
-        fountain: 0,
-        altar: 0,
-        planningHall: 0,
-        chamber: 0,
-        royalPalace: 0,
-    }
+      agora: 1,
+      lumberMill: 1,
+      farm: 1,
+      tradeRoute: 1,
+      armory: 1,
+      barracks: 1,
+      fortress: 1,
+      argyroeides: 0,
+      quarry: 0,
+      oikia: 0,
+      oracle: 0,
+      temple: 0,
+      port: 0,
+      academy: 0,
+      gymnasium: 0,
+      fountain: 0,
+      altar: 0,
+      planningHall: 0,
+      chamber: 0,
+      royalPalace: 0,
+    };
   }
 
   initializeUserData(): IUser {
@@ -278,7 +303,7 @@ export class CreateCharacterComponent {
       const reader = new FileReader();
       reader.onload = () => {
         this.characterForm.patchValue({
-          profilePicture: reader.result
+          profilePicture: reader.result,
         });
       };
       reader.readAsDataURL(this.selectedFile);
@@ -298,12 +323,115 @@ export class CreateCharacterComponent {
           facebook: this.characterForm.get('facebook')?.value,
           twitter: this.characterForm.get('twitter')?.value,
           linkedIn: this.characterForm.get('linkedIn')?.value,
-          instagram: this.characterForm.get('instagram')?.value
+          instagram: this.characterForm.get('instagram')?.value,
         },
-        bio: this.characterForm.get('bio')?.value
+        bio: this.characterForm.get('bio')?.value,
       };
-    } 
-    console.log(this.newUserData, this.newHeroData, this.newHeroStats, this.selectedFile, this.newHeroBuildings);
-    
+    }
+    console.log(
+      this.newUserData,
+      this.newHeroData,
+      this.newHeroStats,
+      this.selectedFile,
+      this.newHeroBuildings
+    );
+    // this.checkIfNamesAreUnique(
+    //   this.newUserData.name,
+    //   this.newHeroData.heroName
+    // );
   }
+
+  async createNewHero(
+    newUserData: any,
+    newHeroData: any,
+    newHeroStats: any,
+    newHeroBuildings: any,
+    selectedFile: File
+  ): Promise<void> {
+    // 1. Wyświetl modal
+    const modalRef = this.modalService.open(ConfirmationModalComponent, {
+      centered: true,
+    });
+    modalRef.componentInstance.confirmationQuestion = `Do you want to create a hero of origin ${
+      this.originsMetadata[this.newHeroData.originId].displayName
+    } with a chosen name?`;
+    modalRef.componentInstance.confirmationData = 'Chosen name: ';
+    modalRef.componentInstance.selectedOption =
+      this.characterForm.value.characterName;
+
+    try {
+      const result = await modalRef.result;
+      if (result === 'confirmed') {
+        this.register();
+        // 2. Utwórz nowego użytkownika w Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(
+          this.auth,
+          newUserData.email,
+          newUserData.password
+        );
+        const user = userCredential.user;
+
+        if (user) {
+          const userId = user.uid;
+
+          // 3. Zapisz dane do odpowiednich dokumentów w Firestore
+          const batch = writeBatch(this.firestore);
+
+          const userNameRef = doc(this.firestore, 'names/userNames');
+          updateDoc(userNameRef, {
+            [this.newUserData.name]: this.newUserData.name,
+          });
+
+          const heroNameRef = doc(this.firestore, 'names/heroNames');
+          updateDoc(heroNameRef, {
+            [this.newHeroData.heroName]: this.newHeroData.heroName,
+          });
+
+          const userRef = doc(this.firestore, `users/${userId}`);
+          batch.set(userRef, newUserData);
+
+          const heroDataRef = doc(this.firestore, `heroData/${userId}`);
+          batch.set(heroDataRef, newHeroData);
+
+          const heroStatsRef = doc(this.firestore, `heroStats/${userId}`);
+          batch.set(heroStatsRef, newHeroStats);
+
+          const heroBuildingsRef = doc(
+            this.firestore,
+            `heroBuildings/${userId}`
+          );
+          batch.set(heroBuildingsRef, newHeroBuildings);
+
+          const heroItemsRef = doc(this.firestore, `heroItems/${userId}`);
+          batch.set(heroItemsRef, {});
+
+          await batch.commit();
+
+          // 4. Zapisz plik do Storage
+          const filePath = `${userId}/${selectedFile.name}`;
+          const fileRef = ref(this.storage, filePath);
+          await uploadBytes(fileRef, selectedFile);
+
+          const url = await getDownloadURL(fileRef);
+
+          // Jeśli potrzebujesz, możesz tutaj zaktualizować dokument użytkownika o URL zdjęcia
+          await setDoc(userRef, { photoURL: url }, { merge: true });
+
+          // 5. Zaloguj użytkownika
+          await signInWithEmailAndPassword(
+            this.auth,
+            newUserData.email,
+            newUserData.password
+          );
+
+          // 6. Przenieś użytkownika do /attributes
+          this.router.navigate(['/attributes']);
+        }
+      }
+    } catch (error) {
+      console.error('Error creating new hero:', error);
+    }
   }
+
+  
+}

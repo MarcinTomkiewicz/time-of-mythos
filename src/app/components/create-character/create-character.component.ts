@@ -15,7 +15,7 @@ import { CarouselComponent } from '../../common/carousel/carousel.component';
 import { IHeroData } from '../../interfaces/hero/i-hero-data';
 import { IHeroStats } from '../../interfaces/hero/i-hero-stats';
 import { IUser } from '../../interfaces/general/i-user';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalComponent } from '../../common/confirmation-modal/confirmation-modal.component';
 import { IAttributesDefinition } from '../../interfaces/definitions/i-attributes';
 import { AttributesPanelComponent } from '../attributes-panel/attributes-panel.component';
@@ -41,6 +41,8 @@ import {
 } from '@angular/fire/storage';
 import { Router } from '@angular/router';
 import { getDoc } from 'firebase/firestore';
+import { Observable, defer, from, map, switchMap } from 'rxjs';
+import { NgbToastOptions } from '@ng-bootstrap/ng-bootstrap/toast/toast-config';
 
 @Component({
   selector: 'app-create-character',
@@ -84,7 +86,7 @@ export class CreateCharacterComponent {
     private firestore: Firestore,
     private auth: Auth,
     private storage: Storage,
-    private router: Router
+    private router: Router,
   ) {
     this.characterForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -257,7 +259,7 @@ export class CreateCharacterComponent {
     return `${baseUrl}${encodedPath}?alt=media`;
   }
 
-  onCarouselSlideChange(index: number) {
+  currentIndexChange(index: number) {
     this.currentIndex = index;
   }
 
@@ -272,6 +274,8 @@ export class CreateCharacterComponent {
       this.originsMetadata[
         this.originsToDisplay[this.currentIndex]
       ].displayName;
+      console.log(this.currentIndex);
+      
     modalRef.result.then((result) => {
       if (result === 'proceed') {
         this.newHeroData.originId = this.originsToDisplay[this.currentIndex];
@@ -333,105 +337,98 @@ export class CreateCharacterComponent {
       this.newHeroData,
       this.newHeroStats,
       this.selectedFile,
-      this.newHeroBuildings
+      this.newHeroBuildings,
+      this.characterForm.value.password
     );
-    // this.checkIfNamesAreUnique(
-    //   this.newUserData.name,
-    //   this.newHeroData.heroName
-    // );
-  }
 
-  async createNewHero(
-    newUserData: any,
-    newHeroData: any,
-    newHeroStats: any,
-    newHeroBuildings: any,
-    selectedFile: File
-  ): Promise<void> {
-    // 1. Wyświetl modal
-    const modalRef = this.modalService.open(ConfirmationModalComponent, {
-      centered: true,
-    });
-    modalRef.componentInstance.confirmationQuestion = `Do you want to create a hero of origin ${
-      this.originsMetadata[this.newHeroData.originId].displayName
-    } with a chosen name?`;
-    modalRef.componentInstance.confirmationData = 'Chosen name: ';
-    modalRef.componentInstance.selectedOption =
-      this.characterForm.value.characterName;
-
-    try {
-      const result = await modalRef.result;
-      if (result === 'confirmed') {
-        this.register();
-        // 2. Utwórz nowego użytkownika w Firebase Auth
-        const userCredential = await createUserWithEmailAndPassword(
-          this.auth,
-          newUserData.email,
-          newUserData.password
-        );
-        const user = userCredential.user;
-
-        if (user) {
-          const userId = user.uid;
-
-          // 3. Zapisz dane do odpowiednich dokumentów w Firestore
-          const batch = writeBatch(this.firestore);
-
-          const userNameRef = doc(this.firestore, 'names/userNames');
-          updateDoc(userNameRef, {
-            [this.newUserData.name]: this.newUserData.name,
-          });
-
-          const heroNameRef = doc(this.firestore, 'names/heroNames');
-          updateDoc(heroNameRef, {
-            [this.newHeroData.heroName]: this.newHeroData.heroName,
-          });
-
-          const userRef = doc(this.firestore, `users/${userId}`);
-          batch.set(userRef, newUserData);
-
-          const heroDataRef = doc(this.firestore, `heroData/${userId}`);
-          batch.set(heroDataRef, newHeroData);
-
-          const heroStatsRef = doc(this.firestore, `heroStats/${userId}`);
-          batch.set(heroStatsRef, newHeroStats);
-
-          const heroBuildingsRef = doc(
-            this.firestore,
-            `heroBuildings/${userId}`
-          );
-          batch.set(heroBuildingsRef, newHeroBuildings);
-
-          const heroItemsRef = doc(this.firestore, `heroItems/${userId}`);
-          batch.set(heroItemsRef, {});
-
-          await batch.commit();
-
-          // 4. Zapisz plik do Storage
-          const filePath = `${userId}/${selectedFile.name}`;
-          const fileRef = ref(this.storage, filePath);
-          await uploadBytes(fileRef, selectedFile);
-
-          const url = await getDownloadURL(fileRef);
-
-          // Jeśli potrzebujesz, możesz tutaj zaktualizować dokument użytkownika o URL zdjęcia
-          await setDoc(userRef, { photoURL: url }, { merge: true });
-
-          // 5. Zaloguj użytkownika
-          await signInWithEmailAndPassword(
-            this.auth,
-            newUserData.email,
-            newUserData.password
-          );
-
-          // 6. Przenieś użytkownika do /attributes
-          this.router.navigate(['/attributes']);
-        }
+    this.createNewHero(this.newUserData, this.newHeroData, this.newHeroStats, this.newHeroBuildings, this.selectedFile).pipe(
+      switchMap(() => signInWithEmailAndPassword(this.auth, this.newUserData.email, this.characterForm.value.password)),
+      switchMap(() => {
+        this.router.navigate(['/attributes']);
+        // this.toastService.show('User successfully registered and logged in', { classname: 'bg-success text-light', delay: 5000 });
+        return from(Promise.resolve());
+      })
+    ).subscribe({
+      error: (error) => {
+        console.error('Error during registration process:', error);
       }
-    } catch (error) {
-      console.error('Error creating new hero:', error);
-    }
+    });
+
   }
 
+  createNewHero(
+    newUserData: IUser,
+    newHeroData: IHeroData,
+    newHeroStats: IHeroStats,
+    newHeroBuildings: IHeroBuildings,
+    selectedFile: File
+  ): Observable<void> {
+    console.log(newHeroStats);
+    
+    return defer(() => {
+      // 1. Wyświetl modal
+      const modalRef = this.modalService.open(ConfirmationModalComponent, {
+        centered: true,
+      });
+      modalRef.componentInstance.confirmationQuestion = `Do you want to create ${
+        this.originsMetadata[newHeroData.originId].displayName
+      } with a chosen name?`;
+      modalRef.componentInstance.confirmationData = 'Chosen name: ';
+      modalRef.componentInstance.selectedOption = this.characterForm.value.characterName;
+  
+      // Convert modal result to Observable
+      return from(modalRef.result);
+    }).pipe(
+      switchMap(result => {
+        if (result !== 'proceed') {
+          throw new Error('User did not confirm the creation');
+        }
+        // Continue with user registration and hero creation
+        return from(createUserWithEmailAndPassword(this.auth, newUserData.email, this.characterForm.value.password));
+      }),
+      switchMap(userCredential => {
+        const user = userCredential.user;
+        if (!user) {
+          throw new Error('No user returned from Firebase Auth');
+        }
+        const userId = user.uid;
+  
+        const batch = writeBatch(this.firestore);
+  
+        const userNameRef = doc(this.firestore, 'names/userNames');
+        updateDoc(userNameRef, { ['names']: newUserData.name });
+  
+        const heroNameRef = doc(this.firestore, 'names/heroNames');
+        updateDoc(heroNameRef, { ['names']: newHeroData.heroName });
+  
+        const userRef = doc(this.firestore, `users/${userId}`);
+        batch.set(userRef, newUserData);
+  
+        const heroDataRef = doc(this.firestore, `heroData/${userId}`);
+        batch.set(heroDataRef, newHeroData);
+  
+        const heroStatsRef = doc(this.firestore, `heroAttributes/${userId}`);
+        batch.set(heroStatsRef, newHeroStats);
+  
+        const heroBuildingsRef = doc(this.firestore, `heroBuildings/${userId}`);
+        batch.set(heroBuildingsRef, newHeroBuildings);
+  
+        const heroItemsRef = doc(this.firestore, `heroItems/${userId}`);
+        batch.set(heroItemsRef, {});
+  
+        return from(batch.commit()).pipe(
+          switchMap(() => {
+            const filePath = `${userId}/${selectedFile.name}`;
+            const fileRef = ref(this.storage, filePath);
+            return from(uploadBytes(fileRef, selectedFile)).pipe(
+              switchMap(() => getDownloadURL(fileRef)),
+              switchMap(url => setDoc(userRef, { photoURL: url }, { merge: true })),
+              map(() => void 0)
+            );
+          })
+        );
+      })
+    );
+  }
   
 }

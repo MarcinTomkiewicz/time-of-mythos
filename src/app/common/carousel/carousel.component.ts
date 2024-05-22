@@ -16,15 +16,17 @@ export class CarouselComponent implements OnInit{
   @Input() heroDataMetadata: any;
   @Input() originsMetadata: any;
   @Input() originsDefinition: any;
+  @Input() currentIndex = 0;
   
   @Output() currentIndexChange = new EventEmitter<number>();
 
-  currentIndex = 0;
   imageUrls: string[] = []; 
 
-  onSlideChange() {
-    this.currentIndexChange.emit(this.currentIndex);
-  }
+  // onSlideChange(index: number) {
+  //   console.log(index);
+      
+  //   this.currentIndex = index;
+  // }
 
   constructor(private originService: OriginService) {}
 
@@ -53,14 +55,12 @@ export class CarouselComponent implements OnInit{
 
   prev() {
     this.currentIndex = this.getRightIndex();
+    this.currentIndexChange.emit(this.currentIndex);
   }
 
   next() {
     this.currentIndex = this.getLeftIndex();
-  }
-
-  log(data: any): void {
-    console.log(data);
+    this.currentIndexChange.emit(this.currentIndex);
   }
 
   getOriginBonus(): { stat: string; bonus: number }[] {

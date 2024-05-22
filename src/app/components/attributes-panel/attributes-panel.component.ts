@@ -18,15 +18,16 @@ import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
   styleUrl: './attributes-panel.component.css',
 })
 export class AttributesPanelComponent implements OnInit {
-  @Input() newHeroData!: IHeroData;
-  @Input() newHeroStats!: IHeroStats;
-  @Input() attributesDefinitions!: { [key: string]: IAttributesDefinition };
-  @Input() attributesMetadata!: { [key: string]: IMetadata };
-  @Input() heroDataMetadata!: { [key: string]: IMetadata };
-  @Input() attributesToDisplay: string[] = [];
+  attributesDefinitions!: { [key: string]: IAttributesDefinition };
+  attributesMetadata!: { [key: string]: IMetadata };
+  heroDataMetadata!: { [key: string]: IMetadata };
+  attributesToDisplay: string[] = [];
 
   heroData!: IHeroData;
   heroStats!: IHeroStats;
+
+  initialHeroData!: IHeroData;
+  initialHeroStats!: IHeroStats;
 
   user: IUser | null = null;
   userUid: string | null = null;
@@ -39,65 +40,125 @@ export class AttributesPanelComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.userUid = this.authService.getUserUID();
-
-    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) => {
-      this.isLoggedIn = isLoggedIn;
-    });
-
     this.authService.getUser().subscribe((user: IUser | null) => {
-      this.user = user;
+      this.userUid = this.authService.getUserUID();
 
+      this.user = user;
       if (this.userUid && this.user) {
         this.loadHeroData(this.userUid);
         this.loadAttributesData(this.userUid);
-      } else {
-        this.heroData = { ...this.newHeroData };
-        this.heroStats = { ...this.newHeroStats };
       }
     });
+
+    this.firestoreService
+      .getDefinitions('definitions/attributes', 'id')
+      .subscribe((attributesDefinition) => {
+        this.attributesDefinitions = attributesDefinition;
+        this.attributesToDisplay = Object.keys(this.attributesDefinitions);
+      });
+
+    this.firestoreService
+      .getMetadata<IMetadata>('attributesMetdata')
+      .subscribe((attributesMetadata) => {
+        this.attributesMetadata = attributesMetadata;
+      });
+
+    this.firestoreService
+      .getMetadata<IMetadata>('heroDataMetadata')
+      .subscribe((heroDataMetadata) => {
+        this.heroDataMetadata = heroDataMetadata;
+      });
   }
 
   loadHeroData(userId: string): void {
-    this.firestoreService.getHeroData(userId).subscribe((heroData) => {
-      this.heroData = heroData;
-    });
+    this.firestoreService
+      .getHeroData<IHeroData>(userId, 'heroData')
+      .subscribe((heroData: IHeroData) => {
+        this.initialHeroData = { ...heroData };
+        this.heroData = heroData;
+      });
   }
 
   loadAttributesData(userId: string): void {
-    this.firestoreService.getAttributesData(userId).subscribe((heroStats) => {
-      this.heroStats = heroStats;
-    });
+    this.firestoreService
+      .getHeroData<IHeroStats>(userId, 'heroAttributes')
+      .subscribe((heroStats: IHeroStats) => {
+        this.initialHeroStats = { ...heroStats };
+        this.heroStats = heroStats;
+      });
   }
 
   getAttributeValue(attribute: string): number {
-    return this.heroStats[attribute as keyof IHeroStats];
+    return this.heroStats[attribute as keyof IHeroStats] ?? 0;
   }
 
-  calculateCostForAttribute(attributeLevel: number): number {   
+  calculateCostForAttribute(attributeLevel: number): number {
     return this.formulasService.calculateAttributeCost(attributeLevel);
   }
 
   increaseAttribute(attribute: string): void {
     if (this.heroStats[attribute as keyof IHeroStats] !== undefined) {
-      const increaseCost = this.calculateCostForAttribute(this.heroStats[attribute as keyof IHeroStats]);
+      const increaseCost = this.calculateCostForAttribute(
+        this.heroStats[attribute as keyof IHeroStats]
+      );
       if (this.heroData.dpPoints >= increaseCost) {
         this.heroStats[attribute as keyof IHeroStats]++;
-        
-        
         this.heroData.dpPoints -= increaseCost;
       }
     }
   }
 
   decreaseAttribute(attribute: string): void {
-    if (this.heroStats[attribute as keyof IHeroStats] !== undefined && this.heroStats[attribute as keyof IHeroStats] > 0) {
-      const increaseCost = this.calculateCostForAttribute(this.heroStats[attribute as keyof IHeroStats] - 1);
-      if (this.heroData.dpPoints + increaseCost <= this.newHeroData.dpPoints) {
+    // Sprawdź, czy atrybut istnieje w danych bohatera i czy jego poziom jest większy niż 0
+    if (
+      this.heroStats[attribute as keyof IHeroStats] !== undefined &&
+      this.heroStats[attribute as keyof IHeroStats] > 0
+    ) {
+      // Oblicz koszt zmniejszenia atrybutu o 1 poziom
+      const decreaseCost = this.calculateCostForAttribute(
+        this.heroStats[attribute as keyof IHeroStats] - 1
+      );
+      // Sprawdź, czy bohater ma wystarczająco punktów doświadczenia, aby zmniejszyć atrybut
+
+      if (
+        this.heroStats[attribute as keyof IHeroStats] >
+        this.initialHeroStats[attribute as keyof IHeroStats]
+      ) {
+        // Zmniejsz poziom atrybutu o 1
         this.heroStats[attribute as keyof IHeroStats]--;
-        this.heroData.dpPoints += increaseCost;
+        // Oddaj punkty doświadczenia bohatera
+        this.heroData.dpPoints += decreaseCost;
       }
     }
+  }
+
+  resetChanges(): void {
+    // Przywróć początkowe wartości atrybutów
+    this.heroStats = { ...this.initialHeroStats };
+
+    // Przywróć początkową liczbę punktów doświadczenia
+    this.heroData.dpPoints = this.initialHeroData.dpPoints;
+  }
+
+  updateAttributes(): void {
+    if (!this.userUid) return;
+
+    this.firestoreService
+      .updateData(this.userUid, 'heroData', {
+        dpPoints: this.heroData.dpPoints,
+      })
+      .subscribe(() => {
+        if (!this.userUid) return;
+        this.loadHeroData(this.userUid);
+      });
+
+    this.firestoreService
+      .updateData(this.userUid, 'heroAttributes', this.heroStats)
+      .subscribe(() => {
+        if (!this.userUid) return;
+
+        this.loadAttributesData(this.userUid);
+      });
   }
 
   log(data: any): void {

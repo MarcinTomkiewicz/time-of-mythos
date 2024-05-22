@@ -13,6 +13,7 @@ import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { DataProcessingService } from './data-processing-service';
 import { IHeroData } from '../interfaces/hero/i-hero-data';
 import { IHeroStats } from '../interfaces/hero/i-hero-stats';
+import { DocumentData, PartialWithFieldValue, setDoc } from 'firebase/firestore';
 // import { QuerySnapshot, collection, doc } from 'firebase/firestore';
 
 @Injectable({
@@ -24,15 +25,16 @@ export class FirestoreService {
     private dataProcessingService: DataProcessingService
   ) {}
   
-  getHeroData(userId: string): Observable<IHeroData> {
-    return new Observable<IHeroData>((observer) => {
-      const heroDataDocRef = doc(this.firestore, `heroData/${userId}`);
 
-      getDoc(heroDataDocRef)
+  getHeroData<T>(userId: string, collection: string): Observable<T> {
+    return new Observable<T>((observer) => {
+      const docRef = doc(this.firestore, `${collection}/${userId}`);
+  
+      getDoc(docRef)
         .then((snapshot) => {
           if (snapshot.exists()) {
-            const heroData = snapshot.data() as IHeroData;
-            observer.next(heroData);
+            const data = snapshot.data() as T;
+            observer.next(data);
           }
         })
         .catch((error) => {
@@ -41,16 +43,14 @@ export class FirestoreService {
     });
   }
 
-  getAttributesData(userId: string): Observable<IHeroStats> {
-    return new Observable<IHeroStats>((observer) => {
-      const heroAttributesDocRef = doc(this.firestore, `heroAttributes/${userId}`);
-
-      getDoc(heroAttributesDocRef)
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const heroAttributes = snapshot.data() as IHeroStats;
-            observer.next(heroAttributes);
-          }
+  updateData<T extends PartialWithFieldValue<DocumentData>>(userId: string, collection: string, data: T): Observable<void> {
+    return new Observable<void>((observer) => {
+      const docRef = doc(this.firestore, `${collection}/${userId}`);
+  
+      setDoc(docRef, data, { merge: true })
+        .then(() => {
+          observer.next();
+          observer.complete();
         })
         .catch((error) => {
           observer.error(error);

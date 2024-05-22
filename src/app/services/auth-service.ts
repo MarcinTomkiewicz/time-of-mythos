@@ -12,7 +12,7 @@ import {
   setDoc,
   getDoc,
 } from '@angular/fire/firestore';
-import { BehaviorSubject, from, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, from, map, Observable, of, switchMap } from 'rxjs';
 import { IUser } from '../interfaces/general/i-user';
 
 @Injectable({
@@ -22,11 +22,12 @@ export class AuthService {
   private loggedInSubject: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   loggedIn$ = this.loggedInSubject.asObservable();
-  private currentUser: User | null = null;
+  private currentUserSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private auth: Auth, private firestore: Firestore) {
     this.auth.onAuthStateChanged((user: User | null) => {
-      this.currentUser = user;
+      this.currentUserSubject.next(user);
       this.loggedInSubject.next(!!user);
     });
   }
@@ -69,31 +70,33 @@ export class AuthService {
   }
 
   getUser(): Observable<IUser | null> {
-    return new Observable<IUser | null>((observer) => {
-      this.waitForAuthState().subscribe(() => {
-        if (this.currentUser) {
-          const userDocRef = doc(this.firestore, `users/${this.currentUser.uid}`);
-          getDoc(userDocRef).then((docSnapshot) => {
-            if (docSnapshot.exists()) {
-              const userData = docSnapshot.data() as IUser;
-              observer.next(userData);
-            } else {
-              observer.next(null);
-            }
-            observer.complete();
-          }).catch((error) => {
-            observer.error(error);
-          });
+    return this.currentUser$.pipe(
+      switchMap((user: User | null) => {
+        if (user) {
+          const userDocRef = doc(this.firestore, `users/${user.uid}`);
+          return from(getDoc(userDocRef)).pipe(
+            map((docSnapshot) => {
+              if (docSnapshot.exists()) {
+                return docSnapshot.data() as IUser;
+              } else {
+                return null;
+              }
+            }),
+            catchError((error) => {
+              console.error('Error fetching user data:', error);
+              return of(null);
+            })
+          );
         } else {
-          observer.next(null);
-          observer.complete();
+          return of(null);
         }
-      });
-    });
+      })
+    );
   }
 
   getUserUID(): string | null {
-    return this.currentUser ? this.currentUser.uid : null;
+    const currentUser = this.currentUserSubject.value;
+    return currentUser ? currentUser.uid : null;
   }
 
   isLoggedIn(): boolean {

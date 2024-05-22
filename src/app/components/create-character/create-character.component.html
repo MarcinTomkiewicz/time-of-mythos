@@ -9,7 +9,8 @@
     [heroDataMetadata]="heroDataMetadata"
     [originsMetadata]="originsMetadata"
     [originsDefinition]="originsDefinitions"
-    (currentIndexChange)="onCarouselSlideChange($event)"
+    (currentIndexChange)="currentIndexChange($event)"
+    [currentIndex]="currentIndex"
  >
   </app-carousel>
   <button class="btn" style="align-self: self-end" (click)="chooseOrigin()">

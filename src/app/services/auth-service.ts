@@ -41,26 +41,6 @@ export class AuthService {
     });
   }
 
-  registerUser(email: string, password: string, name: string) {
-    return from(
-      createUserWithEmailAndPassword(this.auth, email, password).then(
-        (userCredential: any) => {
-          const user = userCredential.user;
-          const userData: IUser = {
-            isAdmin: false,
-            isOnline: true,
-            name: name,
-            email: email,
-          };
-          const userDocRef = doc(this.firestore, `users/${user.uid}`);
-          return setDoc(userDocRef, userData).then(() => {
-            return signInWithEmailAndPassword(this.auth, email, password);
-          });
-        }
-      )
-    );
-  }
-
   loginUser(email: string, password: string) {
     return from(signInWithEmailAndPassword(this.auth, email, password));
   }

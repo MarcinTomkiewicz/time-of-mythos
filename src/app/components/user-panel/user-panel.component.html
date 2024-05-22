@@ -1,13 +1,31 @@
-<div *ngIf="isLoggedIn; else notLoggedIn">
+<div *ngIf="user; else notLoggedIn">
   <div class="d-flex flex-column w-100">
     <h4>Dashboard</h4>
-    <div class="d-flex flex-column align-items-center px-3 pb-4 gap-3">
-  <div>Welcome, {{ user?.name }}!</div>
-  <button type="submit" class="btn" (click)="logout()">Log out</button>
-</div>
+    <div class="d-flex flex-column align-items-center px-3 pb-2 gap-1">
+      <div class="player-image-container">
+        <img
+          [src]="user.photoURL"
+          [alt]="user.name + 'avatar'"
+          class="player-image"
+        />
+      </div>
+
+      <div>Hello, {{ user.name }}!</div>
+
+      <div class="user-data pb-2">
+        <div>Email: {{ user.email }}</div>
+        <div>Last login: {{ getFormattedLastLogin() }}</div>
+      </div>
+
+      <button type="submit" class="btn" (click)="logout()">Log out</button>
+    </div>
   </div>
 </div>
 
 <ng-template #notLoggedIn>
-  <app-auth-forms [isInTopBar]="false" [emailId]="'emailSide'" [passwordId]="'passwordSide'"></app-auth-forms>
+  <app-auth-forms
+    [isInTopBar]="false"
+    [emailId]="'emailSide'"
+    [passwordId]="'passwordSide'"
+  ></app-auth-forms>
 </ng-template>

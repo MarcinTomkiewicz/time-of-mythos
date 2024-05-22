@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth-service';
 import { AuthFormsComponent } from '../../common/auth-forms/auth-forms.component';
 import { IUser } from '../../interfaces/general/i-user';
-import { User } from 'firebase/auth';
+import { CommonService } from '../../services/common-service';
 
 @Component({
   selector: 'app-user-panel',
@@ -13,19 +13,24 @@ import { User } from 'firebase/auth';
   styleUrls: ['./user-panel.component.css'],
 })
 export class UserPanelComponent implements OnInit {
-  isLoggedIn: boolean = false;
+  userUid!: string | null;
   user!: IUser | null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private commonService: CommonService) {}
 
   ngOnInit(): void {
-    this.authService.loggedIn$.subscribe((isLoggedIn: boolean) => {
-      this.isLoggedIn = isLoggedIn;
-    });
+    this.authService.getUser().subscribe((user: IUser | null) => {
+      this.userUid = this.authService.getUserUID();
 
-      this.authService.getUser().subscribe((user: IUser | null) => {
-        this.user = user;
-      });
+      this.user = user;
+    })
+  }
+
+  getFormattedLastLogin(): string {
+    if (this.user) {
+      return this.commonService.convertTimestampToDate(this.user.lastLogin);
+    }
+    return 'N/A';
   }
 
   logout() {

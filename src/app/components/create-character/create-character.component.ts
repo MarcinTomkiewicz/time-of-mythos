@@ -40,7 +40,7 @@ import {
   uploadBytes,
 } from '@angular/fire/storage';
 import { Router } from '@angular/router';
-import { getDoc } from 'firebase/firestore';
+import { Timestamp, getDoc } from 'firebase/firestore';
 import { Observable, defer, from, map, switchMap } from 'rxjs';
 import { NgbToastOptions } from '@ng-bootstrap/ng-bootstrap/toast/toast-config';
 
@@ -217,10 +217,11 @@ export class CreateCharacterComponent {
       name: '',
       email: '',
       birthday: new Date(0),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      lastLogin: new Date(),
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      lastLogin: Timestamp.now(),
       city: '',
+      photoURL: '',
       socialLinks: {
         facebook: '',
         twitter: '',
@@ -322,7 +323,7 @@ export class CreateCharacterComponent {
         name: this.characterForm.get('name')?.value,
         birthday: this.characterForm.get('birthday')?.value,
         city: this.characterForm.get('city')?.value,
-        createdAt: new Date(),
+        createdAt: Timestamp.now(),
         socialLinks: {
           facebook: this.characterForm.get('facebook')?.value,
           twitter: this.characterForm.get('twitter')?.value,

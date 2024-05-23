@@ -43,6 +43,7 @@ import { Router } from '@angular/router';
 import { Timestamp, getDoc } from 'firebase/firestore';
 import { Observable, defer, from, map, switchMap } from 'rxjs';
 import { NgbToastOptions } from '@ng-bootstrap/ng-bootstrap/toast/toast-config';
+import { IHeroResources } from '../../interfaces/hero/i-resources';
 
 @Component({
   selector: 'app-create-character',
@@ -72,6 +73,7 @@ export class CreateCharacterComponent {
   newHeroStats: IHeroStats;
   newHeroBuildings: IHeroBuildings;
   newUserData: IUser;
+  newHeroResources: IHeroResources;
   originChosen: boolean = false;
   nameChosen: boolean = false;
   currentIndex: number = 0;
@@ -86,7 +88,7 @@ export class CreateCharacterComponent {
     private firestore: Firestore,
     private auth: Auth,
     private storage: Storage,
-    private router: Router,
+    private router: Router
   ) {
     this.characterForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -107,6 +109,7 @@ export class CreateCharacterComponent {
     this.newHeroStats = this.initializeHeroStats();
     this.newHeroBuildings = this.initializeHeroBuildings();
     this.newUserData = this.initializeUserData();
+    this.newHeroResources = this.initializeHeroResources();
   }
 
   ngOnInit(): void {
@@ -232,6 +235,14 @@ export class CreateCharacterComponent {
     };
   }
 
+  initializeHeroResources(): IHeroResources {
+    return {
+      drachma: { currentValue: 100, growthPerHour: 10 },
+      material: { currentValue: 100, growthPerHour: 10 },
+      workforce: { currentValue: 100, growthPerHour: 10 },
+    };
+  }
+
   getOriginDisplayName(originName: string): string {
     return this.originsMetadata[originName]?.displayName ?? '';
   }
@@ -275,8 +286,8 @@ export class CreateCharacterComponent {
       this.originsMetadata[
         this.originsToDisplay[this.currentIndex]
       ].displayName;
-      console.log(this.currentIndex);
-      
+    console.log(this.currentIndex);
+
     modalRef.result.then((result) => {
       if (result === 'proceed') {
         this.newHeroData.originId = this.originsToDisplay[this.currentIndex];
@@ -333,28 +344,33 @@ export class CreateCharacterComponent {
         bio: this.characterForm.get('bio')?.value,
       };
     }
-    console.log(
+
+    this.createNewHero(
       this.newUserData,
       this.newHeroData,
       this.newHeroStats,
-      this.selectedFile,
       this.newHeroBuildings,
-      this.characterForm.value.password
-    );
-
-    this.createNewHero(this.newUserData, this.newHeroData, this.newHeroStats, this.newHeroBuildings, this.selectedFile).pipe(
-      switchMap(() => signInWithEmailAndPassword(this.auth, this.newUserData.email, this.characterForm.value.password)),
-      switchMap(() => {
-        this.router.navigate(['/attributes']);
-        // this.toastService.show('User successfully registered and logged in', { classname: 'bg-success text-light', delay: 5000 });
-        return from(Promise.resolve());
-      })
-    ).subscribe({
-      error: (error) => {
-        console.error('Error during registration process:', error);
-      }
-    });
-
+      this.newHeroResources,
+      this.selectedFile
+    )
+      .pipe(
+        switchMap(() =>
+          signInWithEmailAndPassword(
+            this.auth,
+            this.newUserData.email,
+            this.characterForm.value.password
+          )
+        ),
+        switchMap(() => {
+          this.router.navigate(['/attributes']);
+          return from(Promise.resolve());
+        })
+      )
+      .subscribe({
+        error: (error) => {
+          console.error('Error during registration process:', error);
+        },
+      });
   }
 
   createNewHero(
@@ -362,10 +378,11 @@ export class CreateCharacterComponent {
     newHeroData: IHeroData,
     newHeroStats: IHeroStats,
     newHeroBuildings: IHeroBuildings,
+    newHeroResources: IHeroResources,
     selectedFile: File
   ): Observable<void> {
     console.log(newHeroStats);
-    
+
     return defer(() => {
       // 1. Wyświetl modal
       const modalRef = this.modalService.open(ConfirmationModalComponent, {
@@ -375,55 +392,67 @@ export class CreateCharacterComponent {
         this.originsMetadata[newHeroData.originId].displayName
       } with a chosen name?`;
       modalRef.componentInstance.confirmationData = 'Chosen name: ';
-      modalRef.componentInstance.selectedOption = this.characterForm.value.characterName;
-  
+      modalRef.componentInstance.selectedOption =
+        this.characterForm.value.characterName;
+
       // Convert modal result to Observable
       return from(modalRef.result);
     }).pipe(
-      switchMap(result => {
+      switchMap((result) => {
         if (result !== 'proceed') {
           throw new Error('User did not confirm the creation');
         }
         // Continue with user registration and hero creation
-        return from(createUserWithEmailAndPassword(this.auth, newUserData.email, this.characterForm.value.password));
+        return from(
+          createUserWithEmailAndPassword(
+            this.auth,
+            newUserData.email,
+            this.characterForm.value.password
+          )
+        );
       }),
-      switchMap(userCredential => {
+      switchMap((userCredential) => {
         const user = userCredential.user;
         if (!user) {
           throw new Error('No user returned from Firebase Auth');
         }
         const userId = user.uid;
-  
+
         const batch = writeBatch(this.firestore);
-  
+
         const userNameRef = doc(this.firestore, 'names/userNames');
         updateDoc(userNameRef, { ['names']: newUserData.name });
-  
+
         const heroNameRef = doc(this.firestore, 'names/heroNames');
         updateDoc(heroNameRef, { ['names']: newHeroData.heroName });
-  
+
         const userRef = doc(this.firestore, `users/${userId}`);
         batch.set(userRef, newUserData);
-  
+
         const heroDataRef = doc(this.firestore, `heroData/${userId}`);
         batch.set(heroDataRef, newHeroData);
-  
+
         const heroStatsRef = doc(this.firestore, `heroAttributes/${userId}`);
         batch.set(heroStatsRef, newHeroStats);
-  
+
         const heroBuildingsRef = doc(this.firestore, `heroBuildings/${userId}`);
         batch.set(heroBuildingsRef, newHeroBuildings);
-  
+
         const heroItemsRef = doc(this.firestore, `heroItems/${userId}`);
         batch.set(heroItemsRef, {});
-  
+
+        const heroResourcesRef = doc(this.firestore, `heroResources/${userId}`);
+        batch.set(heroResourcesRef, newHeroResources);
+
         return from(batch.commit()).pipe(
           switchMap(() => {
             const filePath = `${userId}/${selectedFile.name}`;
             const fileRef = ref(this.storage, filePath);
             return from(uploadBytes(fileRef, selectedFile)).pipe(
               switchMap(() => getDownloadURL(fileRef)),
-              switchMap(url => setDoc(userRef, { photoURL: url }, { merge: true })),
+              switchMap((url) =>
+                setDoc(userRef, { photoURL: url }, { merge: true })
+              ),
               map(() => void 0)
             );
           })
@@ -431,5 +460,4 @@ export class CreateCharacterComponent {
       })
     );
   }
-  
 }

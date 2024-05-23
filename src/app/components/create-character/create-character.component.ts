@@ -281,7 +281,7 @@ export class CreateCharacterComponent {
     });
     modalRef.componentInstance.confirmationQuestion =
       'Are you sure you want to choose this origin?';
-    modalRef.componentInstance.confirmationData = 'Selected origin';
+    modalRef.componentInstance.confirmationData = 'Selected origin: ';
     modalRef.componentInstance.selectedOption =
       this.originsMetadata[
         this.originsToDisplay[this.currentIndex]
@@ -381,8 +381,6 @@ export class CreateCharacterComponent {
     newHeroResources: IHeroResources,
     selectedFile: File
   ): Observable<void> {
-    console.log(newHeroStats);
-
     return defer(() => {
       // 1. Wyświetl modal
       const modalRef = this.modalService.open(ConfirmationModalComponent, {

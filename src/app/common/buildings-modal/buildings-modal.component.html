@@ -10,8 +10,16 @@
         </div>
     </div>
     <div>Build Time: {{ buildingData.buildTime }}</div>
-    <div>Requirements: {{ buildingData.requirements }}</div>
-    <div>Bonuses: {{ buildingData.bonuses }}</div>
+    <div class="d-flex flex-row justify-content-start gap-1">Requirements: 
+        <div *ngFor="let buildingReq of buildingData.requirements">
+            <span>{{ getRequirementDescription(buildingReq) }}</span>
+        </div>
+    </div>
+    <div class="d-flex flex-row justify-content-start gap-1">Bonuses: 
+        <div *ngFor="let buildingBonus of buildingData.bonuses">
+            <span>{{ buildingBonus.type === 'resourceGrowth' ? buildingBonus.resource : buildingBonus.type }} {{ buildingBonus.value }},</span>
+        </div>
+    </div>
     <div>Cost Formula: {{ buildingData.costFormula }}</div>
     <div>Build Time Formula: {{ buildingData.buildTimeFormula }}</div>
     <div>Requirements Formula: {{ buildingData.requirementFormula }}</div>

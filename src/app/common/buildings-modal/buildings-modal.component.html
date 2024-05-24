@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h4 class="modal-title text-uppercase">{{ buildingName }}</h4>
+</div>
+<div class="modal-body">
+  <div class="d-flex flex-column gap-2">
+    <div>ID: {{ buildingData.id }}</div>
+    <div class="d-flex flex-row justify-content-start gap-1">Cost: 
+        <div *ngFor="let buildingCost of buildingData.cost">
+            <span>{{ buildingCost.resource }} {{ buildingCost.amount }},</span>
+        </div>
+    </div>
+    <div>Build Time: {{ buildingData.buildTime }}</div>
+    <div>Requirements: {{ buildingData.requirements }}</div>
+    <div>Bonuses: {{ buildingData.bonuses }}</div>
+    <div>Cost Formula: {{ buildingData.costFormula }}</div>
+    <div>Build Time Formula: {{ buildingData.buildTimeFormula }}</div>
+    <div>Requirements Formula: {{ buildingData.requirementFormula }}</div>
+    <div>Bonus Formula: {{ buildingData.bonusFormula }}</div>
+    <div>Min. Player Hierarchy: {{ buildingData.minPlayerHierarchyLevel }}</div>
+    <div>Max. Building Level: {{ buildingData.maxBuildingLevel }}</div>
+    <div>Icon: : {{ buildingData.icon }}</div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn" (click)="proceed()">Proceed</button>
+  <button type="button" class="btn" (click)="cancel()">Cancel</button>
+</div>

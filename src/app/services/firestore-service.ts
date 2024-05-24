@@ -1,20 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { IOriginsDefinition } from '../interfaces/definitions/i-origins';
 import { IMetadata } from '../interfaces/metadata/i-metadata';
-import {
-  Firestore,
-  getDoc,
-  getDocs,
-  doc,
-  collection,
-} from '@angular/fire/firestore';
+import { Firestore, getDoc, doc } from '@angular/fire/firestore';
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { DataProcessingService } from './data-processing-service';
-import { IHeroData } from '../interfaces/hero/i-hero-data';
-import { IHeroStats } from '../interfaces/hero/i-hero-stats';
-import { DocumentData, PartialWithFieldValue, setDoc } from 'firebase/firestore';
-// import { QuerySnapshot, collection, doc } from 'firebase/firestore';
+import {
+  DocumentData,
+  PartialWithFieldValue,
+  setDoc,
+} from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -24,12 +18,11 @@ export class FirestoreService {
     private firestore: Firestore,
     private dataProcessingService: DataProcessingService
   ) {}
-  
 
   getHeroData<T>(userId: string, collection: string): Observable<T> {
     return new Observable<T>((observer) => {
       const docRef = doc(this.firestore, `${collection}/${userId}`);
-  
+
       getDoc(docRef)
         .then((snapshot) => {
           if (snapshot.exists()) {
@@ -43,10 +36,14 @@ export class FirestoreService {
     });
   }
 
-  updateData<T extends PartialWithFieldValue<DocumentData>>(userId: string, collection: string, data: T): Observable<void> {
+  updateData<T extends PartialWithFieldValue<DocumentData>>(
+    userId: string,
+    collection: string,
+    data: T
+  ): Observable<void> {
     return new Observable<void>((observer) => {
       const docRef = doc(this.firestore, `${collection}/${userId}`);
-  
+
       setDoc(docRef, data, { merge: true })
         .then(() => {
           observer.next();

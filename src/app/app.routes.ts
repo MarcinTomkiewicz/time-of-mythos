@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MainContentComponent } from './components/main-content/main-content.component';
 import { CreateCharacterComponent } from './components/create-character/create-character.component';
 import { AttributesPanelComponent } from './components/attributes-panel/attributes-panel.component';
+import { ManageBuildingsComponent } from './admin/manage-buildings/manage-buildings.component';
 
 const gameRoutes: Routes = [
   { path: 'dashboard', component: MainContentComponent },
@@ -25,9 +26,14 @@ const homeRoutes: Routes = [
   { path: 'contact', component: MainContentComponent },
 ];
 
+const adminRoutes: Routes = [
+  {path: 'admin/manage-buildings', component: ManageBuildingsComponent},
+]
+
 export const routes: Routes = [
     ...gameRoutes,
-    ...homeRoutes
+    ...homeRoutes,
+    ...adminRoutes,
   ];
 
 @NgModule({

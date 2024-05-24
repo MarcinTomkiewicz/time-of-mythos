@@ -16,12 +16,14 @@ export class DataProcessingService {
       name: key,
     }));
 
+    
+    
     definitionsArray.sort((a, b) => {
       if (a[idKey] < b[idKey]) return -1;
       if (a[idKey] > b[idKey]) return 1;
       return 0;
     });
-
+    
     // Konwersja posortowanej tablicy z powrotem na obiekt
     let sortedDefinitions = definitionsArray.reduce((acc: any, definition) => {
       acc[definition.name] = definition;

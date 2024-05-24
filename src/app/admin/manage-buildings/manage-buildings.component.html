@@ -1,0 +1,31 @@
+<div *ngIf="isAdmin && buildingsToDisplay">
+    <h4>Manage Buildings</h4>
+    <div *ngFor="let building of buildingsToDisplay">
+        <button class='btn' (click)="openBuildingEditModal(buildingsDefinition[building], buildingsMetadata[building].displayName)">{{ buildingsMetadata[building].displayName }}</button>
+    </div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div *ngIf="!isAdmin">
+    <p>You do not have access to this page.</p>
+  </div>

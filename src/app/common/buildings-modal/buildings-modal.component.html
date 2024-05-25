@@ -2,34 +2,90 @@
   <h4 class="modal-title text-uppercase">{{ buildingName }}</h4>
 </div>
 <div class="modal-body">
-  <div class="d-flex flex-column gap-2">
-    <div>ID: {{ buildingData.id }}</div>
-    <div class="d-flex flex-row justify-content-start gap-1">Cost: 
-        <div *ngFor="let buildingCost of buildingData.cost">
-            <span>{{ buildingCost.resource }} {{ buildingCost.amount }},</span>
+  <form [formGroup]="buildingForm" (ngSubmit)="submitForm()">
+    <div class="d-flex flex-column gap-2 w-100">
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>ID:</div>
+        <div class="w-50"><input type="text" formControlName="id" /></div>
+      </div>
+  
+      <div class="d-flex flex-row justify-content-between w-100" formArrayName="cost">
+        <div>Cost:</div>
+        <div class="w-50 d-flex flex-column gap-2">
+          <div *ngFor="let costGroup of cost.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2">
+            <input type="text" formControlName="resource" placeholder="Resource" />
+            <input type="number" formControlName="amount" placeholder="Amount" />
+          </div>
         </div>
-    </div>
-    <div>Build Time: {{ buildingData.buildTime }}</div>
-    <div class="d-flex flex-row justify-content-start gap-1">Requirements: 
-        <div *ngFor="let buildingReq of buildingData.requirements">
-            <span>{{ getRequirementDescription(buildingReq) }}</span>
+      </div>
+  
+      <div class="d-flex flex-row justify-content-between w-100" formArrayName="requirements">
+        <div>Requirements:</div>
+        <div class="w-50 d-flex flex-column gap-2">
+          <div *ngFor="let reqGroup of requirements.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2">
+            <input type="text" formControlName="type" placeholder="Type" />
+            <div *ngIf="reqGroup.get('buildingId')" class="d-flex flex-row gap-2">
+              <input type="text" formControlName="buildingId" placeholder="Building ID" />
+              <input type="number" formControlName="level" placeholder="Level" />
+            </div>
+            <div *ngIf="reqGroup.get('stat')" class="d-flex flex-row gap-2">
+              <input type="text" formControlName="stat" placeholder="Stat" />
+              <input type="number" formControlName="value" placeholder="Value" />
+            </div>
+            <div *ngIf="reqGroup.get('value') && !reqGroup.get('stat')">
+              <input type="number" formControlName="value" placeholder="Value" />
+            </div>
+          </div>
         </div>
-    </div>
-    <div class="d-flex flex-row justify-content-start gap-1">Bonuses: 
-        <div *ngFor="let buildingBonus of buildingData.bonuses">
-            <span>{{ buildingBonus.type === 'resourceGrowth' ? buildingBonus.resource : buildingBonus.type }} {{ buildingBonus.value }},</span>
+      </div>
+  
+      <div class="d-flex flex-row justify-content-between w-100" formArrayName="bonuses">
+        <div>Bonuses:</div>
+        <div class="w-50 d-flex flex-column gap-2">
+          <div *ngFor="let bonusGroup of bonuses.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2">
+            <input type="text" formControlName="type" placeholder="Type" (change)="onBonusTypeChange(i)" />
+            <input *ngIf="isResourceBonus(i)" type="text" formControlName="resource" placeholder="Resource" />
+            <input type="number" formControlName="value" placeholder="Value" />
+          </div>
         </div>
+      </div>
+  
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>Build Time:</div>
+        <div class="w-50"><input type="number" formControlName="buildTime" /></div>
+      </div>
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>Cost Formula:</div>
+        <div class="w-50"><input type="text" formControlName="costFormula" class="w-100" /></div>
+      </div>
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>Build Time Formula:</div>
+        <div class="w-50"><input type="text" formControlName="buildTimeFormula" class="w-100" /></div>
+      </div>
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>Requirements Formula:</div>
+        <div class="w-50"><input type="text" formControlName="requirementFormula" class="w-100" /></div>
+      </div>
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>Bonus Formula:</div>
+        <div class="w-50"><input type="text" formControlName="bonusFormula" class="w-100" /></div>
+      </div>
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>Min. Player Hierarchy:</div>
+        <div class="w-50"><input type="number" formControlName="minPlayerHierarchyLevel" /></div>
+      </div>
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>Max. Building Level:</div>
+        <div class="w-50"><input type="number" formControlName="maxBuildingLevel" /></div>
+      </div>
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>Icon:</div>
+        <div class="w-50"><input type="text" formControlName="icon" /></div>
+      </div>
     </div>
-    <div>Cost Formula: {{ buildingData.costFormula }}</div>
-    <div>Build Time Formula: {{ buildingData.buildTimeFormula }}</div>
-    <div>Requirements Formula: {{ buildingData.requirementFormula }}</div>
-    <div>Bonus Formula: {{ buildingData.bonusFormula }}</div>
-    <div>Min. Player Hierarchy: {{ buildingData.minPlayerHierarchyLevel }}</div>
-    <div>Max. Building Level: {{ buildingData.maxBuildingLevel }}</div>
-    <div>Icon: : {{ buildingData.icon }}</div>
+  </form>
+  <div class="modal-footer">
+    <button type="submit"  [disabled]="buildingForm.invalid" class="btn" (click)="proceed()">Proceed</button>
+    <button type="button" class="btn" (click)="cancel()">Cancel</button>
   </div>
-</div>
-<div class="modal-footer">
-  <button type="button" class="btn" (click)="proceed()">Proceed</button>
-  <button type="button" class="btn" (click)="cancel()">Cancel</button>
 </div>

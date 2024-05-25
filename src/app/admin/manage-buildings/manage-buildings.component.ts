@@ -51,11 +51,7 @@ export class ManageBuildingsComponent implements OnInit {
       .getMetadata('buildingsMetadata')
       .subscribe((buildingMetadata: { [key: string]: IMetadata }) => {
         this.buildingsMetadata = buildingMetadata;
-      });
-
-
-      console.log(this.buildingsToDisplay);
-      
+      });      
   }
 
   openBuildingEditModal(building: IBuilding, buildingName: string) {

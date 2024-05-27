@@ -54,7 +54,7 @@
             class="btn mt-2"
             (click)="addCost()"
           >
-            +
+            Add cost
           </button>
         </div>
       </div>
@@ -128,7 +128,7 @@
             </button>
           </div>
           <button type="button" class="btn mt-2" (click)="addRequirement()">
-            +
+            Add requirement
           </button>
         </div>
       </div>
@@ -159,7 +159,9 @@
               -
             </button>
           </div>
-          <button type="button" class="btn mt-2" (click)="addBonus()">+</button>
+          <button type="button" class="btn mt-2" (click)="addBonus()">
+            Add bonus
+          </button>
         </div>
       </div>
       <div class="d-flex flex-row justify-content-between w-100">
@@ -167,92 +169,206 @@
         <div class="w-50 d-flex flex-column">
           <div class="d-flex flex-row">
             <input type="text" formControlName="costFormula" class="w-75" />
-            <button type="button" class="btn w-25" (click)="toggleTestForm('cost')">Test formula</button>
+            <button
+              type="button"
+              class="btn w-25"
+              (click)="toggleTestForm('cost')"
+            >
+              Test formula
+            </button>
           </div>
           <div *ngIf="showTestForm.cost">
             <form [formGroup]="testForm">
               <div class="d-flex flex-row justify-content-between w-100">
                 <div>Current level:</div>
-                <input type="number" formControlName="costCurrentLevel" class="w-50" />
+                <input
+                  type="number"
+                  formControlName="costCurrentLevel"
+                  class="w-50"
+                />
               </div>
               <div class="d-flex flex-row justify-content-between w-100">
                 <div>Next level Cost:</div>
-                <input type="text" [value]="testResult.cost" disabled class="w-50" />
+                <input
+                  type="text"
+                  [value]="testResult.cost"
+                  disabled
+                  class="w-50"
+                />
               </div>
               <button type="button" class="btn" disabled>Test</button>
             </form>
           </div>
         </div>
       </div>
-      
+
       <div class="d-flex flex-row justify-content-between w-100">
         <div>Build Time Formula:</div>
         <div class="w-50 d-flex flex-column">
-          <div class="d-flex flex-row">
-            <input type="text" formControlName="buildTimeFormula" class="w-75" />
-            <button type="button" class="btn w-25" (click)="toggleTestForm('buildTime')">Test formula</button>
+          <div class="d-flex flex-row align-items-start">
+            <div class="d-flex flex-column align-items-start w-75">
+              <div class="d-flex w-100">
+                <select formControlName="operation" class="flex-grow-1">
+                  <option value="multiply">Multiply</option>
+                  <option value="divide">Divide</option>
+                  <!-- Dodaj więcej operacji, jeśli potrzeba -->
+                </select>
+                <button type="button" class="btn" (click)="addOperand()">
+                  Add Operand
+                </button>
+              </div>
+              <div
+                formArrayName="operands"
+                *ngFor="
+                  let operand of getOperandsControls().controls;
+                  let i = index
+                "
+              >
+                <div
+                  [formGroupName]="i"
+                  class="d-flex flex-row align-items-center w-100"
+                >
+                  <select formControlName="type">
+                    <option value="variable">Variable</option>
+                    <option value="constant">Constant</option>
+                  </select>
+                  <input
+                    *ngIf="operand.get('type')?.value === 'variable'"
+                    type="text"
+                    formControlName="name"
+                    placeholder="Variable Name"
+                    class="w-50"
+                  />
+                  <input
+                    *ngIf="operand.get('type')?.value === 'constant'"
+                    type="number"
+                    formControlName="value"
+                    placeholder="Constant Value"
+                    class="w-50"
+                  />
+                  <button type="button" class="btn" (click)="removeOperand(i)">
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <div>
+                <h5>Constructed Formula:</h5>
+                <div>{{ buildTimeFormulaDisplay }}</div>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn w-25"
+              (click)="toggleTestForm('buildTime')"
+            >
+              Test formula
+            </button>
           </div>
           <div *ngIf="showTestForm.buildTime">
             <form [formGroup]="testForm">
               <div class="d-flex flex-row justify-content-between">
                 <div class="w-25">Current level:</div>
-                <input type="number" formControlName="buildTimeCurrentLevel" class="w-50" />
+                <input
+                  type="number"
+                  formControlName="buildTimeCurrentLevel"
+                  class="w-50"
+                />
               </div>
               <div class="d-flex flex-row justify-content-between w-100">
                 <div>Next level Build Time:</div>
-                <input type="text" [value]="testResult.buildTime" disabled class="w-50" />
+                <input
+                  type="text"
+                  [value]="testResult.buildTime"
+                  disabled
+                  class="w-50"
+                />
               </div>
               <button type="button" class="btn" disabled>Test</button>
             </form>
           </div>
         </div>
       </div>
-      
+
       <div class="d-flex flex-row justify-content-between w-100">
         <div>Requirements Formula:</div>
         <div class="w-50 d-flex flex-column">
           <div class="d-flex flex-row">
-            <input type="text" formControlName="requirementFormula" class="w-75" />
-            <button type="button" class="btn w-25" (click)="toggleTestForm('requirement')">Test formula</button>
+            <input
+              type="text"
+              formControlName="requirementFormula"
+              class="w-75"
+            />
+            <button
+              type="button"
+              class="btn w-25"
+              (click)="toggleTestForm('requirement')"
+            >
+              Test formula
+            </button>
           </div>
           <div *ngIf="showTestForm.requirement">
             <form [formGroup]="testForm">
               <div class="d-flex flex-row justify-content-between w-100">
                 <div>Current level:</div>
-                <input type="number" formControlName="requirementCurrentLevel" class="w-50" />
+                <input
+                  type="number"
+                  formControlName="requirementCurrentLevel"
+                  class="w-50"
+                />
               </div>
               <div class="d-flex flex-row justify-content-between w-100">
                 <div>Next level Requirements:</div>
-                <input type="text" [value]="testResult.requirement" disabled class="w-50" />
+                <input
+                  type="text"
+                  [value]="testResult.requirement"
+                  disabled
+                  class="w-50"
+                />
               </div>
               <button type="button" class="btn" disabled>Test</button>
             </form>
           </div>
         </div>
       </div>
-      
+
       <div class="d-flex flex-row justify-content-between w-100">
         <div>Bonus Formula:</div>
         <div class="w-50 d-flex flex-column">
           <div class="d-flex flex-row">
             <input type="text" formControlName="bonusFormula" class="w-75" />
-            <button type="button" class="btn w-25" (click)="toggleTestForm('bonus')">Test formula</button>
+            <button
+              type="button"
+              class="btn w-25"
+              (click)="toggleTestForm('bonus')"
+            >
+              Test formula
+            </button>
           </div>
           <div *ngIf="showTestForm.bonus">
             <form [formGroup]="testForm">
               <div class="d-flex flex-row justify-content-between w-100">
                 <div>Current level:</div>
-                <input type="number" formControlName="bonusCurrentLevel" class="w-50" />
+                <input
+                  type="number"
+                  formControlName="bonusCurrentLevel"
+                  class="w-50"
+                />
               </div>
               <div class="d-flex flex-row justify-content-between w-100">
                 <div>Next level Bonus:</div>
-                <input type="text" [value]="testResult.bonus" disabled class="w-50" />
+                <input
+                  type="text"
+                  [value]="testResult.bonus"
+                  disabled
+                  class="w-50"
+                />
               </div>
               <button type="button" class="btn" disabled>Test</button>
             </form>
           </div>
         </div>
       </div>
+
       <div class="d-flex flex-row justify-content-between w-100">
         <div>Min. Player Hierarchy:</div>
         <div class="w-50">

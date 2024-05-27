@@ -96,7 +96,10 @@ export class BuildingsModalComponent implements OnInit {
         this.buildingData.bonuses.map((bonus) => this.createBonusGroup(bonus))
       ),
       costFormula: [this.buildingData.costFormula],
-      buildTimeFormula: [this.buildingData.buildTimeFormula],
+      buildTimeFormula: this.formBuilder.group({
+        operation: ['multiply', Validators.required],
+        operands: this.formBuilder.array([])
+      }),
       requirementFormula: [this.buildingData.requirementFormula],
       bonusFormula: [this.buildingData.bonusFormula],
       minPlayerHierarchyLevel: [this.buildingData.minPlayerHierarchyLevel],
@@ -229,22 +232,10 @@ export class BuildingsModalComponent implements OnInit {
       reqGroup.removeControl('stat');
     }
   }
-  
+
   toggleTestForm(formulaType: keyof typeof this.showTestForm) {
     this.showTestForm[formulaType] = !this.showTestForm[formulaType];
   }
-
-  // testFormula(formulaType: string) {
-  //   const currentLevel = this.testForm.get(`${formulaType}CurrentLevel`)?.value;
-  //   let result;
-  //   try {
-  //     const formula = this.buildingForm.get(`${formulaType}Formula`)?.value;
-  //     result = eval(formula.replace(/level/g, currentLevel));
-  //   } catch (error) {
-  //     result = 'Error';
-  //   }
-  //   this.testResult[formulaType] = result;
-  // }
 
   get cost(): FormArray {
     return this.buildingForm.get('cost') as FormArray;
@@ -286,4 +277,39 @@ export class BuildingsModalComponent implements OnInit {
         return `Unknown requirement type`;
     }
   }
+
+
+  get buildTimeFormulaDisplay(): string {
+    const buildTimeFormula = this.buildingForm.get('buildTimeFormula');
+    if (buildTimeFormula) {
+      const operation = buildTimeFormula.get('operation')?.value;
+      const operands = buildTimeFormula.get('operands')?.value.map((operand: any) => {
+        if (operand.type === 'variable') {
+          return operand.name;
+        } else {
+          return operand.value;
+        }
+      }).join(` ${operation} `);
+
+      return operands;
+    }
+    return '';
+  }
+
+  getOperandsControls(): FormArray {
+    return this.buildingForm.get('buildTimeFormula.operands') as FormArray;
+  }
+
+  addOperand(): void {
+    this.getOperandsControls().push(this.formBuilder.group({
+      type: ['variable', Validators.required],
+      name: [''],
+      value: ['']
+    }));
+  }
+
+  removeOperand(index: number): void {
+    this.getOperandsControls().removeAt(index);
+  }
+
 }

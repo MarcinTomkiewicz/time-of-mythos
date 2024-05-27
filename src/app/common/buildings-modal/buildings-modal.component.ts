@@ -1,24 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { IBuilding, ICost } from '../../interfaces/definitions/i-building';
-import { CommonModule, NgFor, NgIf } from '@angular/common';
-import {
-  IBuildingRequirement,
-  IHeroLevelRequirement,
-  IHeroStatRequirement,
-  IRequirement,
-} from '../../interfaces/definitions/i-requirements';
+import { NgFor, NgIf } from '@angular/common';
+import { IRequirement } from '../../interfaces/definitions/i-requirements';
 import {
   FormArray,
   FormBuilder,
   FormGroup,
-  NgModel,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { IMetadata } from '../../interfaces/metadata/i-metadata';
 import { FirestoreService } from '../../services/firestore-service';
 import { IBonus } from '../../interfaces/definitions/i-bonus';
+import { ResourceType } from '../../interfaces/definitions/i-resources';
 
 @Component({
   selector: 'app-buildings-modal',
@@ -32,6 +27,11 @@ export class BuildingsModalComponent implements OnInit {
   buildingData!: IBuilding;
   buildingForm!: FormGroup;
   resourcesMetadata!: { [key: string]: IMetadata };
+  attributesMetadata!: { [key: string]: IMetadata };
+  bonusesMetadata!: { [key: string]: IMetadata };
+  resourceKeys: string[] = [];
+  attributesKeys: string[] = [];
+  bonusesKeys: string[] = [];
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -48,7 +48,22 @@ export class BuildingsModalComponent implements OnInit {
       .getMetadata('resourcesMetadata')
       .subscribe((resourcesMetadata: { [key: string]: IMetadata }) => {
         this.resourcesMetadata = resourcesMetadata;
-        this.initializeForm();
+        this.resourceKeys = Object.keys(this.resourcesMetadata);
+
+        this.firestoreService
+          .getMetadata('attributesMetdata')
+          .subscribe((attributesMetadata: { [key: string]: IMetadata }) => {
+            this.attributesMetadata = attributesMetadata;
+            this.attributesKeys = Object.keys(this.attributesMetadata);
+
+            this.firestoreService
+              .getMetadata('bonusesMetadata')
+              .subscribe((bonusesMetadata: { [key: string]: IMetadata }) => {
+                this.bonusesMetadata = bonusesMetadata;
+                this.bonusesKeys = Object.keys(this.bonusesMetadata);
+                this.initializeForm();
+              });
+          });
       });
   }
 
@@ -59,8 +74,14 @@ export class BuildingsModalComponent implements OnInit {
         this.buildingData.cost.map((cost) => this.createCostGroup(cost))
       ),
       buildTime: [this.buildingData.buildTime, Validators.required],
-      requirements: this.formBuilder.array(this.buildingData.requirements.map(requirement => this.createRequirementGroup(requirement))),
-      bonuses: this.formBuilder.array(this.buildingData.bonuses.map(bonus => this.createBonusGroup(bonus))),
+      requirements: this.formBuilder.array(
+        this.buildingData.requirements.map((requirement) =>
+          this.createRequirementGroup(requirement)
+        )
+      ),
+      bonuses: this.formBuilder.array(
+        this.buildingData.bonuses.map((bonus) => this.createBonusGroup(bonus))
+      ),
       costFormula: [this.buildingData.costFormula],
       buildTimeFormula: [this.buildingData.buildTimeFormula],
       requirementFormula: [this.buildingData.requirementFormula],
@@ -73,57 +94,120 @@ export class BuildingsModalComponent implements OnInit {
 
   createCostGroup(cost: ICost): FormGroup {
     return this.formBuilder.group({
-      resource: [
-        this.resourcesMetadata[cost.resource]?.displayName || 'Unknown',
-        Validators.required,
-      ],
-      amount: [cost.amount, Validators.required],
+      resource: [cost.resource, Validators.required],
+      amount: [cost.amount, [Validators.required, Validators.min(0)]],
     });
   }
 
-  // createResourceGroup(cost: ICost): FormGroup {
-  //   return this.formBuilder.group({
-  //     resource: [
-  //       this.resourcesMetadata[cost.resource]?.displayName || 'Unknown',
-  //       Validators.required,
-  //     ],
-  //     amount: [cost.amount, Validators.required],
-  //   });
-  // }
-  
   createRequirementGroup(requirement: IRequirement): FormGroup {
     if (requirement.type === 'building') {
-      const req = requirement;
       return this.formBuilder.group({
-        type: [req.type, Validators.required],
-        buildingId: [req.buildingId, Validators.required],
-        level: [req.level, Validators.required],
+        type: [requirement.type, Validators.required],
+        buildingId: [requirement.buildingId, Validators.required],
+        level: [requirement.level, Validators.required],
       });
     } else if (requirement.type === 'heroStat') {
-      const req = requirement;
       return this.formBuilder.group({
-        type: [req.type, Validators.required],
-        stat: [req.stat, Validators.required],
-        value: [req.value, Validators.required],
+        type: [requirement.type, Validators.required],
+        stat: [requirement.stat, Validators.required],
+        value: [requirement.value, Validators.required],
       });
     } else if (requirement.type === 'heroLevel') {
-      const req = requirement;
       return this.formBuilder.group({
-        type: [req.type, Validators.required],
-        value: [req.value, Validators.required],
+        type: [requirement.type, Validators.required],
+        value: [requirement.value, Validators.required],
       });
     } else {
-      // Można wyrzucić błąd, gdy typ wymagania jest nieznany
       throw new Error('Unknown requirement type');
     }
   }
-  
+
   createBonusGroup(bonus: IBonus): FormGroup {
     return this.formBuilder.group({
       type: [bonus.type, Validators.required],
       value: [bonus.value, Validators.required],
-      resource: [bonus.resource ?? ''],
     });
+  }
+
+  addCost(): void {
+    if (this.cost.length < 3) {
+      this.cost.push(
+        this.createCostGroup({ resource: ResourceType.Drachma, amount: 0 })
+      );
+    }
+  }
+
+  removeCost(index: number): void {
+    if (this.cost.length > 1) {
+      this.cost.removeAt(index);
+    }
+  }
+
+  addRequirement(): void {
+    this.requirements.push(
+      this.createRequirementGroup({
+        type: 'building',
+        buildingId: '',
+        level: 1,
+      })
+    );
+  }
+
+  removeRequirement(index: number): void {
+    if (this.requirements.length > 1) {
+      this.requirements.removeAt(index);
+    }
+  }
+
+  addBonus(): void {
+    if (this.bonuses.length < 3) {
+      this.bonuses.push(
+        this.createBonusGroup({ type: this.bonusesKeys[0], value: 0 })
+      );
+    }
+  }
+
+  removeBonus(index: number): void {
+    if (this.bonuses.length > 1) {
+      this.bonuses.removeAt(index);
+    }
+  }
+
+  onRequirementTypeChange(index: number): void {
+    const reqGroup = this.requirements.at(index) as FormGroup;
+    const typeControl = reqGroup.get('type');
+
+    if (typeControl?.value === 'building') {
+      reqGroup.addControl(
+        'buildingId',
+        this.formBuilder.control('', Validators.required)
+      );
+      reqGroup.addControl(
+        'level',
+        this.formBuilder.control('', Validators.required)
+      );
+      reqGroup.removeControl('stat');
+      reqGroup.removeControl('value');
+    } else if (typeControl?.value === 'heroStat') {
+      reqGroup.addControl(
+        'stat',
+        this.formBuilder.control(this.attributesKeys[0], Validators.required)
+      );
+      reqGroup.addControl(
+        'value',
+        this.formBuilder.control('', Validators.required)
+      );
+      reqGroup.removeControl('buildingId');
+      reqGroup.removeControl('level');
+    } else if (typeControl?.value === 'heroLevel') {
+      reqGroup.addControl(
+        'value',
+        this.formBuilder.control('', Validators.required)
+      );
+      reqGroup.removeControl('buildingId');
+      reqGroup.removeControl('level');
+      reqGroup.removeControl('stat');
+    }
   }
 
   get cost(): FormArray {
@@ -138,24 +222,9 @@ export class BuildingsModalComponent implements OnInit {
     return this.buildingForm.get('bonuses') as FormArray;
   }
 
-  isResourceBonus(index: number): boolean {
-    const bonusGroup = this.bonuses.at(index) as FormGroup;
-    return bonusGroup.get('type')?.value === 'resourceGrowth'; // Upewnij się, że 'resource' jest prawidłowym typem bonusu
-  }
-
-  onBonusTypeChange(index: number): void {
-    const bonusGroup = this.bonuses.at(index) as FormGroup;
-    const typeControl = bonusGroup.get('type');
-    if (typeControl?.value !== 'resource') {
-      bonusGroup.get('resource')?.setValue('');
-    }
-  }
-
   submitForm() {
     if (this.buildingForm.valid) {
-      // Tutaj możesz wysłać dane do bazy danych
       console.log('Submitted building data:', this.buildingForm.value);
-      // Na razie tylko logujemy dane, musisz jeszcze zaimplementować wysyłanie do bazy danych
     } else {
       console.error('Form is invalid.');
     }

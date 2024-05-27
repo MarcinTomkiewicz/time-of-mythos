@@ -1,0 +1,6 @@
+.btn {
+    padding: 2px;
+    flex-shrink: 1;
+    width: 10%;
+    min-width: unset;
+}

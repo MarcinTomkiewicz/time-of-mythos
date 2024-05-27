@@ -2,7 +2,7 @@
   <h4 class="modal-title text-uppercase">{{ buildingName }}</h4>
 </div>
 <div class="modal-body">
-  <form [formGroup]="buildingForm" (ngSubmit)="submitForm()">
+  <form *ngIf="buildingForm" [formGroup]="buildingForm" (ngSubmit)="submitForm()">
     <div class="d-flex flex-column gap-2 w-100">
       <div class="d-flex flex-row justify-content-between w-100">
         <div>ID:</div>
@@ -12,41 +12,60 @@
       <div class="d-flex flex-row justify-content-between w-100" formArrayName="cost">
         <div>Cost:</div>
         <div class="w-50 d-flex flex-column gap-2">
-          <div *ngFor="let costGroup of cost.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2">
-            <input type="text" formControlName="resource" placeholder="Resource" />
+          <div *ngFor="let costGroup of cost.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2 align-items-center">
+            <select formControlName="resource">
+              <option *ngFor="let key of resourceKeys" [value]="key">
+                {{ resourcesMetadata[key].displayName || key }}
+              </option>
+            </select>
             <input type="number" formControlName="amount" placeholder="Amount" />
+            <button *ngIf="cost.controls.length > 1" type="button" class="btn" (click)="removeCost(i)">-</button>
           </div>
+          <button *ngIf="cost.controls.length < 3" type="button" class="btn mt-2" (click)="addCost()">+</button>
         </div>
       </div>
   
       <div class="d-flex flex-row justify-content-between w-100" formArrayName="requirements">
         <div>Requirements:</div>
         <div class="w-50 d-flex flex-column gap-2">
-          <div *ngFor="let reqGroup of requirements.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2">
-            <input type="text" formControlName="type" placeholder="Type" />
+          <div *ngFor="let reqGroup of requirements.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2 align-items-center">
+            <select formControlName="type" (change)="onRequirementTypeChange(i)">
+              <option value="building">Building</option>
+              <option value="heroStat">Hero Stat</option>
+              <option value="heroLevel">Hero Level</option>
+            </select>
             <div *ngIf="reqGroup.get('buildingId')" class="d-flex flex-row gap-2">
               <input type="text" formControlName="buildingId" placeholder="Building ID" />
               <input type="number" formControlName="level" placeholder="Level" />
             </div>
             <div *ngIf="reqGroup.get('stat')" class="d-flex flex-row gap-2">
-              <input type="text" formControlName="stat" placeholder="Stat" />
+              <select formControlName="stat">
+                <option *ngFor="let key of attributesKeys" [value]="key">
+                  {{ attributesMetadata[key].displayName || key }}
+                </option>
+              </select>
               <input type="number" formControlName="value" placeholder="Value" />
             </div>
-            <div *ngIf="reqGroup.get('value') && !reqGroup.get('stat')">
-              <input type="number" formControlName="value" placeholder="Value" />
+            <div *ngIf="reqGroup.get('value') && !reqGroup.get('stat') && !reqGroup.get('buildingId')">
+              <input type="number" formControlName="value" placeholder="Minimum Hero Level" />
             </div>
+            <button *ngIf="requirements.controls.length > 1" type="button" class="btn" (click)="removeRequirement(i)">-</button>
           </div>
+          <button type="button" class="btn mt-2" (click)="addRequirement()">+</button>
         </div>
       </div>
   
       <div class="d-flex flex-row justify-content-between w-100" formArrayName="bonuses">
         <div>Bonuses:</div>
         <div class="w-50 d-flex flex-column gap-2">
-          <div *ngFor="let bonusGroup of bonuses.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2">
-            <input type="text" formControlName="type" placeholder="Type" (change)="onBonusTypeChange(i)" />
-            <input *ngIf="isResourceBonus(i)" type="text" formControlName="resource" placeholder="Resource" />
+          <div *ngFor="let bonusGroup of bonuses.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2 align-items-center">
+            <select formControlName="type">
+              <option *ngFor="let key of bonusesKeys" [value]="key">{{ bonusesMetadata[key].displayName || key }}</option>
+            </select>
             <input type="number" formControlName="value" placeholder="Value" />
+            <button *ngIf="bonuses.controls.length > 1" type="button" class="btn" (click)="removeBonus(i)">-</button>
           </div>
+          <button type="button" class="btn mt-2" (click)="addBonus()">+</button>
         </div>
       </div>
   
@@ -85,7 +104,7 @@
     </div>
   </form>
   <div class="modal-footer">
-    <button type="submit"  [disabled]="buildingForm.invalid" class="btn" (click)="proceed()">Proceed</button>
+    <button type="submit"  [disabled]="buildingForm?.invalid" class="btn" (click)="proceed()">Proceed</button>
     <button type="button" class="btn" (click)="cancel()">Cancel</button>
   </div>
 </div>

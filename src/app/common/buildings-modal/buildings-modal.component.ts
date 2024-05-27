@@ -26,12 +26,25 @@ export class BuildingsModalComponent implements OnInit {
   buildingName: string = '';
   buildingData!: IBuilding;
   buildingForm!: FormGroup;
+  testForm!: FormGroup;
   resourcesMetadata!: { [key: string]: IMetadata };
   attributesMetadata!: { [key: string]: IMetadata };
   bonusesMetadata!: { [key: string]: IMetadata };
   resourceKeys: string[] = [];
   attributesKeys: string[] = [];
   bonusesKeys: string[] = [];
+  showTestForm = {
+    cost: false,
+    buildTime: false,
+    requirement: false,
+    bonus: false,
+  };
+  testResult = {
+    cost: '',
+    buildTime: '',
+    requirement: '',
+    bonus: '',
+  };
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -89,6 +102,13 @@ export class BuildingsModalComponent implements OnInit {
       minPlayerHierarchyLevel: [this.buildingData.minPlayerHierarchyLevel],
       maxBuildingLevel: [this.buildingData.maxBuildingLevel],
       icon: [this.buildingData.icon],
+    });
+
+    this.testForm = this.formBuilder.group({
+      costCurrentLevel: [0, Validators.required],
+      buildTimeCurrentLevel: [0, Validators.required],
+      requirementCurrentLevel: [0, Validators.required],
+      bonusCurrentLevel: [0, Validators.required],
     });
   }
 
@@ -209,6 +229,22 @@ export class BuildingsModalComponent implements OnInit {
       reqGroup.removeControl('stat');
     }
   }
+  
+  toggleTestForm(formulaType: keyof typeof this.showTestForm) {
+    this.showTestForm[formulaType] = !this.showTestForm[formulaType];
+  }
+
+  // testFormula(formulaType: string) {
+  //   const currentLevel = this.testForm.get(`${formulaType}CurrentLevel`)?.value;
+  //   let result;
+  //   try {
+  //     const formula = this.buildingForm.get(`${formulaType}Formula`)?.value;
+  //     result = eval(formula.replace(/level/g, currentLevel));
+  //   } catch (error) {
+  //     result = 'Error';
+  //   }
+  //   this.testResult[formulaType] = result;
+  // }
 
   get cost(): FormArray {
     return this.buildingForm.get('cost') as FormArray;

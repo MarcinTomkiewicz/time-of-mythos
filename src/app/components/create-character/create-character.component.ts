@@ -15,13 +15,12 @@ import { CarouselComponent } from '../../common/carousel/carousel.component';
 import { IHeroData } from '../../interfaces/hero/i-hero-data';
 import { IHeroStats } from '../../interfaces/hero/i-hero-stats';
 import { IUser } from '../../interfaces/general/i-user';
-import { NgbModal, NgbToast, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalComponent } from '../../common/confirmation-modal/confirmation-modal.component';
 import { IAttributesDefinition } from '../../interfaces/definitions/i-attributes';
 import { AttributesPanelComponent } from '../attributes-panel/attributes-panel.component';
 import { IHeroBuildings } from '../../interfaces/hero/i-hero-buildings';
 import {
-  FieldValue,
   Firestore,
   doc,
   setDoc,
@@ -40,9 +39,8 @@ import {
   uploadBytes,
 } from '@angular/fire/storage';
 import { Router } from '@angular/router';
-import { Timestamp, getDoc } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { Observable, defer, from, map, switchMap } from 'rxjs';
-import { NgbToastOptions } from '@ng-bootstrap/ng-bootstrap/toast/toast-config';
 import { IHeroResources } from '../../interfaces/hero/i-resources';
 
 @Component({

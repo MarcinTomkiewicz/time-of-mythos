@@ -14,6 +14,7 @@ import { IMetadata } from '../../interfaces/metadata/i-metadata';
 import { FirestoreService } from '../../services/firestore-service';
 import { IBonus } from '../../interfaces/definitions/i-bonus';
 import { ResourceType } from '../../interfaces/definitions/i-resources';
+import { FormulasService } from '../../services/formulas-service';
 
 @Component({
   selector: 'app-buildings-modal',
@@ -49,7 +50,8 @@ export class BuildingsModalComponent implements OnInit {
   constructor(
     public activeModal: NgbActiveModal,
     private formBuilder: FormBuilder,
-    private firestoreService: FirestoreService
+    private firestoreService: FirestoreService,
+    private formulasService: FormulasService
   ) {}
 
   ngOnInit(): void {
@@ -96,10 +98,7 @@ export class BuildingsModalComponent implements OnInit {
         this.buildingData.bonuses.map((bonus) => this.createBonusGroup(bonus))
       ),
       costFormula: [this.buildingData.costFormula],
-      buildTimeFormula: this.formBuilder.group({
-        operation: ['multiply', Validators.required],
-        operands: this.formBuilder.array([])
-      }),
+      buildTimeFormula: [this.buildingData.buildTimeFormula],
       requirementFormula: [this.buildingData.requirementFormula],
       bonusFormula: [this.buildingData.bonusFormula],
       minPlayerHierarchyLevel: [this.buildingData.minPlayerHierarchyLevel],
@@ -196,6 +195,14 @@ export class BuildingsModalComponent implements OnInit {
     }
   }
 
+  testRequirementsFormula(formula: string, baseRequirement: IRequirement[], level: number) {
+    this.formulasService.calculateRequirementsFormula(formula, baseRequirement, level)
+  }
+
+  testCostFormula(formula: string, baseCost: ICost[], level: number): void {
+    this.formulasService.calculateCostFormula(formula, baseCost, level);
+  }
+
   onRequirementTypeChange(index: number): void {
     const reqGroup = this.requirements.at(index) as FormGroup;
     const typeControl = reqGroup.get('type');
@@ -276,40 +283,6 @@ export class BuildingsModalComponent implements OnInit {
       default:
         return `Unknown requirement type`;
     }
-  }
-
-
-  get buildTimeFormulaDisplay(): string {
-    const buildTimeFormula = this.buildingForm.get('buildTimeFormula');
-    if (buildTimeFormula) {
-      const operation = buildTimeFormula.get('operation')?.value;
-      const operands = buildTimeFormula.get('operands')?.value.map((operand: any) => {
-        if (operand.type === 'variable') {
-          return operand.name;
-        } else {
-          return operand.value;
-        }
-      }).join(` ${operation} `);
-
-      return operands;
-    }
-    return '';
-  }
-
-  getOperandsControls(): FormArray {
-    return this.buildingForm.get('buildTimeFormula.operands') as FormArray;
-  }
-
-  addOperand(): void {
-    this.getOperandsControls().push(this.formBuilder.group({
-      type: ['variable', Validators.required],
-      name: [''],
-      value: ['']
-    }));
-  }
-
-  removeOperand(index: number): void {
-    this.getOperandsControls().removeAt(index);
   }
 
 }

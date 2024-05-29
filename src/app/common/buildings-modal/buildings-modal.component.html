@@ -196,7 +196,7 @@
                   class="w-50"
                 />
               </div>
-              <button type="button" class="btn" disabled>Test</button>
+              <button type="button" class="btn" (click)="testCostFormula(buildingForm.get('costFormula')?.value, buildingForm.get('cost')?.value, testForm.get('costCurrentLevel')?.value)">Test</button>
             </form>
           </div>
         </div>
@@ -205,57 +205,12 @@
       <div class="d-flex flex-row justify-content-between w-100">
         <div>Build Time Formula:</div>
         <div class="w-50 d-flex flex-column">
-          <div class="d-flex flex-row align-items-start">
-            <div class="d-flex flex-column align-items-start w-75">
-              <div class="d-flex w-100">
-                <select formControlName="operation" class="flex-grow-1">
-                  <option value="multiply">Multiply</option>
-                  <option value="divide">Divide</option>
-                  <!-- Dodaj więcej operacji, jeśli potrzeba -->
-                </select>
-                <button type="button" class="btn" (click)="addOperand()">
-                  Add Operand
-                </button>
-              </div>
-              <div
-                formArrayName="operands"
-                *ngFor="
-                  let operand of getOperandsControls().controls;
-                  let i = index
-                "
-              >
-                <div
-                  [formGroupName]="i"
-                  class="d-flex flex-row align-items-center w-100"
-                >
-                  <select formControlName="type">
-                    <option value="variable">Variable</option>
-                    <option value="constant">Constant</option>
-                  </select>
-                  <input
-                    *ngIf="operand.get('type')?.value === 'variable'"
-                    type="text"
-                    formControlName="name"
-                    placeholder="Variable Name"
-                    class="w-50"
-                  />
-                  <input
-                    *ngIf="operand.get('type')?.value === 'constant'"
-                    type="number"
-                    formControlName="value"
-                    placeholder="Constant Value"
-                    class="w-50"
-                  />
-                  <button type="button" class="btn" (click)="removeOperand(i)">
-                    Remove
-                  </button>
-                </div>
-              </div>
-              <div>
-                <h5>Constructed Formula:</h5>
-                <div>{{ buildTimeFormulaDisplay }}</div>
-              </div>
-            </div>
+          <div class="d-flex flex-row">
+            <input
+              type="text"
+              formControlName="buildTimeFormula"
+              class="w-75"
+            />
             <button
               type="button"
               class="btn w-25"
@@ -266,8 +221,8 @@
           </div>
           <div *ngIf="showTestForm.buildTime">
             <form [formGroup]="testForm">
-              <div class="d-flex flex-row justify-content-between">
-                <div class="w-25">Current level:</div>
+              <div class="d-flex flex-row justify-content-between w-100">
+                <div>Current level:</div>
                 <input
                   type="number"
                   formControlName="buildTimeCurrentLevel"
@@ -325,7 +280,7 @@
                   class="w-50"
                 />
               </div>
-              <button type="button" class="btn" disabled>Test</button>
+              <button type="button" class="btn" (click)="testRequirementsFormula(buildingForm.get('requirementFormula')?.value, buildingForm.get('requirements')?.value, testForm.get('requirementCurrentLevel')?.value)">Test</button>
             </form>
           </div>
         </div>

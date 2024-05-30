@@ -1,14 +1,13 @@
-<div *ngIf="buildingsData; else loading">
+<div *ngIf="buildingsData && buildingsKeys; else loading">
   <div
-    class="d-flex flex-column w-100 gap-2"
-    *ngFor="let buildingKey of buildingsKeys"
-  >
-    <div class="d-flex flex-row w-100 justify-content-start gap-2">
+    class="d-flex flex-column w-100"
+    *ngFor="let buildingKey of buildingsKeys">
+    <div class="d-flex flex-row w-100 justify-content-start gap-3 mb-2 align-items-center card">
       <div>
         <img
-          [src]="buildingsDefinition[buildingKey].icon"
+          [src]="buildingIcons[buildingKey]"
           alt="Building"
-          style="height: 200px; width: auto"
+          style="height: 200px; width: auto; border-radius: 5px;"
         />
       </div>
       <div class="d-flex flex-column w-100 justify-content-start gap-1">
@@ -16,12 +15,14 @@
         <div>Level: {{ heroBuildings[buildingKey] || 0 }}</div>
         <div>
           Bonuses:
-          {{
-            calculateBonuses(
-              buildingsDefinition[buildingKey],
-              heroBuildings[buildingKey] || 0
-            )
-          }}
+          <span
+            [innerHTML]="
+              calculateBonuses(
+                buildingsDefinition[buildingKey],
+                heroBuildings[buildingKey] || 0
+              )
+            "
+          ></span>
         </div>
         <div>
           Build time:
@@ -34,28 +35,32 @@
         </div>
         <div>
           Requirements for next level:
-          {{
-            calculateRequirements(
-              buildingsDefinition[buildingKey],
-              (heroBuildings[buildingKey] || 0) + 1
-            )
-          }}
+          <span
+            [innerHTML]="
+              calculateRequirements(
+                buildingsDefinition[buildingKey],
+                (heroBuildings[buildingKey] || 0) + 1
+              )
+            "
+          ></span>
         </div>
         <div>
           Cost for next level:
-          {{
-            calculateCost(
-              buildingsDefinition[buildingKey],
-              (heroBuildings[buildingKey] || 0) + 1
-            )
-          }}
+          <span
+            [innerHTML]="
+              calculateCost(
+                buildingsDefinition[buildingKey],
+                (heroBuildings[buildingKey] || 0) + 1
+              )
+            "
+          ></span>
         </div>
-        <button class="btn">Build next level</button>
+        <button type="submit" class="btn">Build next level</button>
       </div>
     </div>
   </div>
 </div>
 
 <ng-template #loading>
-  <!-- Wyświetl jakiś komunikat ładowania -->
+  <div>Loading...</div>
 </ng-template>

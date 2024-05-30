@@ -27,94 +27,80 @@ export class FormulasService {
 
   calculateCostFormula(formula: string, base: ICost[], level: number): ICost[] {
     let resultDataArray: ICost[] = [];
-
+  
     for (let item of base) {
       let baseAmount = item.amount;
-
+  
       let convertedFormula = formula
         .replaceAll(/baseCost/g, baseAmount.toString())
         .replaceAll(/level/g, level.toString());
-
-      let newAmount = math.evaluate(convertedFormula);
-
+  
+      let newAmount = Math.max(1, Math.floor(math.evaluate(convertedFormula))); // Zabezpieczenie, że wartość wynikowa będzie przynajmniej 1
+  
       resultDataArray.push({
         amount: newAmount,
         resource: item.resource,
       });
     }
-
+  
     return resultDataArray;
   }
-
-  calculateBuildTimeFormula(
-    formula: string,
-    baseBuildTime: number,
-    level: number
-  ): number {
+  
+  calculateBuildTimeFormula(formula: string, baseBuildTime: number, level: number): number {
     let convertedFormula = formula
       .replaceAll(/baseBuildTime/g, baseBuildTime.toString())
       .replaceAll(/level/g, level.toString());
-    console.log(math.evaluate(convertedFormula));
-
-    return math.evaluate(convertedFormula);
+    let result = Math.max(1, Math.floor(math.evaluate(convertedFormula))); // Zabezpieczenie, że wartość wynikowa będzie przynajmniej 1
+  
+    return result;
   }
-
-  calculateRequirementsFormula(
-    formula: string,
-    base: IRequirement[],
-    level: number
-  ): IRequirement[] {
+  
+  calculateRequirementsFormula(formula: string, base: IRequirement[], level: number): IRequirement[] {
     return base?.map((item) => {
       let newItem = { ...item };
-
+      
       if ((item as IBuildingRequirement).type === 'building') {
         let buildingRequirement = item as IBuildingRequirement;
         let convertedFormula = formula
           .replaceAll(/baseRequirement/g, buildingRequirement.level.toString())
           .replaceAll(/level/g, level.toString());
-        let newLevel = math.evaluate(convertedFormula);
+        let newLevel = Math.max(1, Math.floor(math.evaluate(convertedFormula))); // Zabezpieczenie, że wartość wynikowa będzie przynajmniej 1
         (newItem as IBuildingRequirement).level = newLevel;
       } else if (
         (item as IHeroStatRequirement).type === 'heroStat' ||
         (item as IHeroLevelRequirement).type === 'heroLevel'
       ) {
-        let valueRequirement = item as
-          | IHeroStatRequirement
-          | IHeroLevelRequirement;
+        let valueRequirement = item as IHeroStatRequirement | IHeroLevelRequirement;
         let baseValue = valueRequirement.value;
         let convertedFormula = formula
           .replaceAll(/baseRequirement/g, baseValue.toString())
           .replaceAll(/level/g, level.toString());
-        let newValue = math.evaluate(convertedFormula);
-        (newItem as IHeroStatRequirement | IHeroLevelRequirement).value =
-          newValue;
+        let newValue = Math.max(1, Math.floor(math.evaluate(convertedFormula))); // Zabezpieczenie, że wartość wynikowa będzie przynajmniej 1
+        (newItem as IHeroStatRequirement | IHeroLevelRequirement).value = newValue;
       }
-
+  
       return newItem;
     });
   }
-
-  calculateBonusFormula(
-    formula: string,
-    baseBonus: IBonus[],
-    level: number
-  ): IBonus[] {
+  
+  calculateBonusFormula(formula: string, baseBonus: IBonus[], level: number): IBonus[] {
     let resultDataArray: IBonus[] = [];
-
+  
     for (let bonus of baseBonus) {
-      let baseBonus = bonus.value;
-
+      let baseBonusValue = bonus.value;
+  
       let convertedFormula = formula
-        .replaceAll(/baseBonus/g, baseBonus.toString())
+        .replaceAll(/baseBonus/g, baseBonusValue.toString())
         .replaceAll(/level/g, level.toString());
-
-      let newBonus = math.evaluate(convertedFormula);
-
+  
+      let newBonusValue = Math.max(1, Math.floor(math.evaluate(convertedFormula))); // Zabezpieczenie, że wartość wynikowa będzie przynajmniej 1
+  
       resultDataArray.push({
         ...bonus,
-        value: newBonus,
+        value: newBonusValue,
       });
     }
+  
     return resultDataArray;
   }
 }

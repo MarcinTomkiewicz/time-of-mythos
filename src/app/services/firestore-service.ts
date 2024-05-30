@@ -107,10 +107,10 @@ export class FirestoreService {
     });
   }
 
-  getDownloadUrl(imagePath: string): Promise<string> {
+  getDownloadUrl(imagePath: string): Observable<string> {
     const storage = getStorage();
     const storageRef = ref(storage, imagePath);
-    return getDownloadURL(storageRef);
+    return from(getDownloadURL(storageRef));
   }
 
   updateBuilding(

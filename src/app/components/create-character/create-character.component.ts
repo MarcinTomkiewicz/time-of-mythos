@@ -125,7 +125,7 @@ export class CreateCharacterComponent {
         for (const key in this.originsDefinitions) {
           this.firestoreService
             .getDownloadUrl(this.originsDefinitions[key].originImg)
-            .then((url) => {
+            .subscribe((url) => {
               this.originsDefinitions[key].originImg = url;
             });
         }

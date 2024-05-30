@@ -1,10 +1,12 @@
 @import '@fontsource/eb-garamond/index.css';
 @import '@fontsource/cormorant-garamond/index.css';
+@import '@fontsource/arvo/index.css';
+@import '@fontsource/aleo/index.css';
 
 body {
-  font-size: 16px !important;
+  font-size: 12px !important;
   color: #464646 !important;
-  font-family: "Cormorant Garamond", serif!important;
+  font-family: "Aleo", serif!important;
   font-optical-sizing: auto;
   box-sizing: border-box;
   --s: 100px; /* control the size */

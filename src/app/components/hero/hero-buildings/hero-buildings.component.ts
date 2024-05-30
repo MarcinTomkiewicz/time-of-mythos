@@ -5,13 +5,13 @@ import { IUser } from '../../../interfaces/general/i-user';
 import { AuthService } from '../../../services/auth-service';
 import { FirestoreService } from '../../../services/firestore-service';
 import { forkJoin } from 'rxjs';
-import { NgFor, NgIf } from '@angular/common';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormulasService } from '../../../services/formulas-service';
 
 @Component({
   selector: 'app-hero-buildings',
   standalone: true,
-  imports: [NgIf, NgFor],
+  imports: [NgIf, NgFor, CommonModule],
   templateUrl: './hero-buildings.component.html',
   styleUrl: './hero-buildings.component.css',
 })
@@ -28,15 +28,18 @@ export class HeroBuildingsComponent {
   attributesMetadata!: { [key: string]: IMetadata };
   bonusesMetadata!: { [key: string]: IMetadata };
   buildingsMetadata!: { [key: string]: IMetadata };
+  requirementsMetadata!: { [key: string]: IMetadata };
   resourceKeys: string[] = [];
   attributesKeys: string[] = [];
   bonusesKeys: string[] = [];
   buildingsKeys: string[] = [];
+  requirementsKeys: string[] = [];
   heroBuildingsKeys: string[] = [];
+  buildingIcons: { [key: string]: string } = {};
 
   constructor(
     private authService: AuthService,
-    private firestoreService: FirestoreService,
+    public firestoreService: FirestoreService,
     private formulasService: FormulasService
   ) {}
 
@@ -52,6 +55,7 @@ export class HeroBuildingsComponent {
           attributes: this.firestoreService.getMetadata('attributesMetdata'),
           bonuses: this.firestoreService.getMetadata('bonusesMetadata'),
           buildings: this.firestoreService.getMetadata('buildingsMetadata'),
+          requirements: this.firestoreService.getMetadata('requirementsMetadata'),
         }).subscribe({
           next: (data) => {
             this.resourcesMetadata = data.resources;
@@ -65,6 +69,10 @@ export class HeroBuildingsComponent {
 
             this.buildingsMetadata = data.buildings;
             this.buildingsKeys = Object.keys(this.buildingsMetadata);
+
+            this.requirementsMetadata = data.requirements;
+            this.requirementsKeys = Object.keys(this.requirementsMetadata);
+            
           },
           error: (error) => {
             console.error('Error loading metadata:', error);
@@ -81,17 +89,44 @@ export class HeroBuildingsComponent {
         this.buildingsDefinition = buildingsDefinition;
         this.buildingsKeys = Object.keys(buildingsDefinition)
         this.buildingsData = Object.values(buildingsDefinition)
-      });     
-    });
-  }
+        this.buildingsKeys.forEach(key => {
+          this.firestoreService.getDownloadUrl('buildings/' + buildingsDefinition[key].icon).subscribe(icon => {
+            this.buildingIcons[key] = icon;                       
+          });
+        });
+      });   
+      });  
+    };
+  
   
     calculateBuildTime(building: IBuilding, level: number): string {
-      return this.formulasService.calculateBuildTimeFormula(
+      const buildTimeSeconds = this.formulasService.calculateBuildTimeFormula(
         building.buildTimeFormula,
         building.buildTime,
         level
-      ).toString();
+      );
+    
+      if (buildTimeSeconds < 60) {
+        return buildTimeSeconds.toString() + " s";
+      } else if (buildTimeSeconds < 3600) {
+        const minutes = Math.floor(buildTimeSeconds / 60);
+        const seconds = buildTimeSeconds % 60;
+        return `${minutes} m ${seconds} s`;
+      } else if (buildTimeSeconds < 86400) {
+        const hours = Math.floor(buildTimeSeconds / 3600);
+        const minutes = Math.floor((buildTimeSeconds % 3600) / 60);
+        const seconds = buildTimeSeconds % 60;
+        return `${hours} h ${minutes} m ${seconds} s`;
+      } else {
+        const days = Math.floor(buildTimeSeconds / 86400);
+        const hours = Math.floor((buildTimeSeconds % 86400) / 3600);
+        const minutes = Math.floor((buildTimeSeconds % 3600) / 60);
+        const seconds = buildTimeSeconds % 60;
+        return `${days} d ${hours} h ${minutes} m ${seconds} s`;
+      }
     }
+    
+    
     calculateBonuses(building: IBuilding, level: number): string {
       const bonuses = this.formulasService.calculateBonusFormula(
         building.bonusFormula,
@@ -100,31 +135,56 @@ export class HeroBuildingsComponent {
       );
       return this.formatAsText(bonuses, this.bonusesMetadata);
     }
-  
+    
     calculateRequirements(building: IBuilding, level: number): string {
       const requirements = this.formulasService.calculateRequirementsFormula(
         building.requirementFormula,
         building.requirements,
         level
       );
-      return this.formatAsText(requirements, this.buildingsMetadata);
+      return this.formatAsText(requirements, this.requirementsMetadata, 'requirement');
     }
   
     calculateCost(building: IBuilding, level: number): string {
-      const cost = this.formulasService.calculateCostFormula(
+      const costs = this.formulasService.calculateCostFormula(
         building.costFormula,
         building.cost,
         level
       );
-      return this.formatAsText(cost, this.resourcesMetadata);
+      return this.formatAsText(costs, this.resourcesMetadata, 'cost');
     }
+  
 
-  formatAsText(data: any[], metadata: { [key: string]: IMetadata }): string {
-    return data.map(item => {
-      const key = Object.keys(item)[0];
-      const value = item[key];
-      const displayName = metadata[key]?.displayName || key;
-      return `<strong>${displayName}:</strong> ${value}`;
-    }).join(', ').replace(/,\s*$/, '.');
-  }
+    formatAsText(
+      items: any[],
+      metadata: { [key: string]: IMetadata },
+      type: 'bonus' | 'cost' | 'requirement' = 'bonus'
+    ): string {
+      return items.map(item => {
+        let displayName = '';
+        let value = '';
+  
+        if (type === 'bonus') {
+          displayName = metadata[item.type]?.displayName || item.type;
+          value = item.value;
+        } else if (type === 'cost') {
+          displayName = this.resourcesMetadata[item.resource]?.displayName || item.resource;
+          value = item.amount;
+        } else if (type === 'requirement') {
+          if (item.type === 'heroLevel') {
+            displayName = this.requirementsMetadata[item.type]?.displayName || item.type;
+            value = item.value;
+          } else if (item.type === 'heroStat') {
+            displayName = this.attributesMetadata[item.stat]?.displayName || item.stat;
+            value = item.value;
+          } else if (item.type === 'building') {
+            displayName = this.buildingsMetadata[item.buildingId]?.displayName || item.buildingId;
+            value = item.level;
+          }
+        }
+  
+        return `<b>${displayName}:</b> ${value}`;
+      }).join(', ') + '.';
+    }
+  
 }

@@ -19,6 +19,8 @@
     "@angular/platform-browser": "^17.0.0",
     "@angular/platform-browser-dynamic": "^17.0.0",
     "@angular/router": "^17.0.0",
+    "@fontsource/aleo": "^5.0.21",
+    "@fontsource/arvo": "^5.0.19",
     "@fontsource/cormorant-garamond": "^5.0.13",
     "@fontsource/eb-garamond": "^5.0.18",
     "@ng-bootstrap/ng-bootstrap": "^16.0.0",

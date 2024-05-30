@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px
   }
   
   table {
@@ -29,10 +30,12 @@
   .actions {
     width: auto;
     white-space: nowrap;
+    text-align: center;
   }
 
   .btn {
-    min-width: 40px!important;
+    min-width: 30px!important;
+    padding: 0px!important;
   }
   
   .attribute-name {

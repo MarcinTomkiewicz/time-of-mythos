@@ -35,7 +35,12 @@
 
   .btn {
     min-width: 30px!important;
-    padding: 0px!important;
+    padding: 0!important;
+    padding-top: 5px!important;
+  }
+
+  .btn::before {
+    transform: translate(0, -15%)!important;
   }
   
   .attribute-name {

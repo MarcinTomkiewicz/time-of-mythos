@@ -131,7 +131,7 @@ export class HeroBuildingsComponent {
       const bonuses = this.formulasService.calculateBonusFormula(
         building.bonusFormula,
         building.bonuses,
-        level
+        level - 1
       );
       return this.formatAsText(bonuses, this.bonusesMetadata);
     }

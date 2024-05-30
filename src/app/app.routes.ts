@@ -4,6 +4,7 @@ import { MainContentComponent } from './components/main-content/main-content.com
 import { CreateCharacterComponent } from './components/create-character/create-character.component';
 import { AttributesPanelComponent } from './components/hero/attributes-panel/attributes-panel.component';
 import { ManageBuildingsComponent } from './admin/manage-buildings/manage-buildings.component';
+import { HeroBuildingsComponent } from './components/hero/hero-buildings/hero-buildings.component';
 
 const gameRoutes: Routes = [
   { path: 'dashboard', component: MainContentComponent },
@@ -11,7 +12,7 @@ const gameRoutes: Routes = [
   { path: 'challenges', component: MainContentComponent },
   { path: 'combat', component: MainContentComponent },
   { path: 'armory', component: MainContentComponent },
-  { path: 'mansion', component: MainContentComponent},
+  { path: 'mansion', component: HeroBuildingsComponent},
   { path: 'trade', component: MainContentComponent },
   { path: 'forum', component: MainContentComponent },
 ];

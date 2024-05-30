@@ -113,8 +113,10 @@ export class FirestoreService {
     return getDownloadURL(storageRef);
   }
 
-
-  updateBuilding(buildingName: string, buildingData: IBuilding): Observable<void> {
+  updateBuilding(
+    buildingName: string,
+    buildingData: IBuilding
+  ): Observable<void> {
     const buildingRef = doc(this.firestore, 'definitions/buildings');
     const updateData = {
       [buildingName]: buildingData,

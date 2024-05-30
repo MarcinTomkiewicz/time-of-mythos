@@ -35,7 +35,7 @@ body {
 
 .btn {
   padding: 10px;
-  background-color: rgba(127, 191, 255, 0.8);
+  background-color: rgba(127, 191, 255, 0.8)!important;
   border: 1px solid #ccc;
   border-radius: 10%;
   min-width: 90px;

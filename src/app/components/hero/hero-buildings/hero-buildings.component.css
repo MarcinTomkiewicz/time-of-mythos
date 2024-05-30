@@ -1,0 +1,10 @@
+.btn {
+    padding: 2px;
+    flex-shrink: 1;
+    width: max-content!important;
+    min-width: unset;
+}
+
+.btn::before {
+    transform: translate(0, -3%)!important;
+}

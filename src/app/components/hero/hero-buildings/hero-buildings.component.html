@@ -1,1 +1,61 @@
-<p>hero-buildings works!</p>
+<div *ngIf="buildingsData; else loading">
+  <div
+    class="d-flex flex-column w-100 gap-2"
+    *ngFor="let buildingKey of buildingsKeys"
+  >
+    <div class="d-flex flex-row w-100 justify-content-start gap-2">
+      <div>
+        <img
+          [src]="buildingsDefinition[buildingKey].icon"
+          alt="Building"
+          style="height: 200px; width: auto"
+        />
+      </div>
+      <div class="d-flex flex-column w-100 justify-content-start gap-1">
+        <h3>{{ buildingsMetadata[buildingKey].displayName }}</h3>
+        <div>Level: {{ heroBuildings[buildingKey] || 0 }}</div>
+        <div>
+          Bonuses:
+          {{
+            calculateBonuses(
+              buildingsDefinition[buildingKey],
+              heroBuildings[buildingKey] || 0
+            )
+          }}
+        </div>
+        <div>
+          Build time:
+          {{
+            calculateBuildTime(
+              buildingsDefinition[buildingKey],
+              heroBuildings[buildingKey] || 0
+            )
+          }}
+        </div>
+        <div>
+          Requirements for next level:
+          {{
+            calculateRequirements(
+              buildingsDefinition[buildingKey],
+              (heroBuildings[buildingKey] || 0) + 1
+            )
+          }}
+        </div>
+        <div>
+          Cost for next level:
+          {{
+            calculateCost(
+              buildingsDefinition[buildingKey],
+              (heroBuildings[buildingKey] || 0) + 1
+            )
+          }}
+        </div>
+        <button class="btn">Build next level</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <!-- Wyświetl jakiś komunikat ładowania -->
+</ng-template>

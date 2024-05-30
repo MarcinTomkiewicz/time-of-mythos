@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IHeroData } from '../../../interfaces/hero/i-hero-data';
 import { IHeroStats } from '../../../interfaces/hero/i-hero-stats';
 import { IAttributesDefinition } from '../../../interfaces/definitions/i-attributes';

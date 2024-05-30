@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { IBuilding, ICost } from '../../interfaces/definitions/i-building';
 import { NgFor, NgIf } from '@angular/common';
 import { IRequirement } from '../../interfaces/definitions/i-requirements';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { IMetadata } from '../../interfaces/metadata/i-metadata';
@@ -15,11 +18,12 @@ import { FirestoreService } from '../../services/firestore-service';
 import { IBonus } from '../../interfaces/definitions/i-bonus';
 import { ResourceType } from '../../interfaces/definitions/i-resources';
 import { FormulasService } from '../../services/formulas-service';
+import { finalize, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-buildings-modal',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule],
+  imports: [NgIf, NgFor, ReactiveFormsModule, NgbAlert],
   templateUrl: './buildings-modal.component.html',
   styleUrl: './buildings-modal.component.css',
 })
@@ -31,21 +35,25 @@ export class BuildingsModalComponent implements OnInit {
   resourcesMetadata!: { [key: string]: IMetadata };
   attributesMetadata!: { [key: string]: IMetadata };
   bonusesMetadata!: { [key: string]: IMetadata };
+  buildingsMetadata!: { [key: string]: IMetadata };
   resourceKeys: string[] = [];
   attributesKeys: string[] = [];
   bonusesKeys: string[] = [];
+  buildingsKeys: string[] = [];
   showTestForm = {
     cost: false,
     buildTime: false,
     requirement: false,
     bonus: false,
   };
-  testResult = {
-    cost: '',
-    buildTime: '',
-    requirement: '',
-    bonus: '',
-  };
+  testResult: {
+    bonuses: IBonus[];
+    requirements: IRequirement[];
+    buildTime: number;
+    cost: ICost[];
+  } = { bonuses: [], requirements: [], buildTime: 0, cost: [] };
+  errorMessage = '';
+  successMessage = '';
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -59,65 +67,131 @@ export class BuildingsModalComponent implements OnInit {
   }
 
   loadMetadataAndInitializeForm() {
-    this.firestoreService
-      .getMetadata('resourcesMetadata')
-      .subscribe((resourcesMetadata: { [key: string]: IMetadata }) => {
-        this.resourcesMetadata = resourcesMetadata;
+    forkJoin({
+      resources: this.firestoreService.getMetadata('resourcesMetadata'),
+      attributes: this.firestoreService.getMetadata('attributesMetdata'),
+      bonuses: this.firestoreService.getMetadata('bonusesMetadata'),
+      buildings: this.firestoreService.getMetadata('buildingsMetadata')
+    }).subscribe({
+      next: (data) => {
+        this.resourcesMetadata = data.resources;
         this.resourceKeys = Object.keys(this.resourcesMetadata);
-
-        this.firestoreService
-          .getMetadata('attributesMetdata')
-          .subscribe((attributesMetadata: { [key: string]: IMetadata }) => {
-            this.attributesMetadata = attributesMetadata;
-            this.attributesKeys = Object.keys(this.attributesMetadata);
-
-            this.firestoreService
-              .getMetadata('bonusesMetadata')
-              .subscribe((bonusesMetadata: { [key: string]: IMetadata }) => {
-                this.bonusesMetadata = bonusesMetadata;
-                this.bonusesKeys = Object.keys(this.bonusesMetadata);
-                this.initializeForm();
-              });
-          });
-      });
+        
+        this.attributesMetadata = data.attributes;
+        this.attributesKeys = Object.keys(this.attributesMetadata);
+  
+        this.bonusesMetadata = data.bonuses;
+        this.bonusesKeys = Object.keys(this.bonusesMetadata);
+  
+        this.buildingsMetadata = data.buildings;
+        this.buildingsKeys = Object.keys(this.buildingsMetadata);
+  
+        this.initializeForm();
+      },
+      error: (error) => {
+        console.error('Error loading metadata:', error);
+      }
+    });
   }
 
   initializeForm() {
     this.buildingForm = this.formBuilder.group({
-      id: [{ value: this.buildingData.id, disabled: true }],
+      id: [
+        { value: this.buildingData.id, disabled: true },
+        Validators.required,
+      ],
       cost: this.formBuilder.array(
-        this.buildingData.cost.map((cost) => this.createCostGroup(cost))
+        this.buildingData.cost.map((cost) => this.createCostGroup(cost)),
+        [Validators.required, this.uniqueValidator({ controlName: 'resource' })]
       ),
-      buildTime: [this.buildingData.buildTime, Validators.required],
+      buildTime: [
+        this.buildingData.buildTime,
+        [Validators.required, Validators.min(1)],
+      ],
       requirements: this.formBuilder.array(
         this.buildingData.requirements.map((requirement) =>
           this.createRequirementGroup(requirement)
-        )
+        ),
+        [Validators.required, this.uniqueRequirementValidator()]
       ),
       bonuses: this.formBuilder.array(
-        this.buildingData.bonuses.map((bonus) => this.createBonusGroup(bonus))
+        this.buildingData.bonuses.map((bonus) => this.createBonusGroup(bonus)),
+        [Validators.required, this.uniqueValidator({ controlName: 'type' })]
       ),
-      costFormula: [this.buildingData.costFormula],
-      buildTimeFormula: [this.buildingData.buildTimeFormula],
-      requirementFormula: [this.buildingData.requirementFormula],
-      bonusFormula: [this.buildingData.bonusFormula],
-      minPlayerHierarchyLevel: [this.buildingData.minPlayerHierarchyLevel],
-      maxBuildingLevel: [this.buildingData.maxBuildingLevel],
-      icon: [this.buildingData.icon],
+      costFormula: [this.buildingData.costFormula, Validators.required],
+      buildTimeFormula: [
+        this.buildingData.buildTimeFormula,
+        Validators.required,
+      ],
+      requirementFormula: [
+        this.buildingData.requirementFormula,
+        Validators.required,
+      ],
+      bonusFormula: [this.buildingData.bonusFormula, Validators.required],
+      minPlayerHierarchyLevel: [
+        this.buildingData.minPlayerHierarchyLevel,
+        Validators.required,
+      ],
+      maxBuildingLevel: [
+        this.buildingData.maxBuildingLevel,
+        Validators.required,
+      ],
+      icon: [this.buildingData.icon, Validators.required],
     });
 
     this.testForm = this.formBuilder.group({
-      costCurrentLevel: [0, Validators.required],
+      costCurrentLevel: [1, [Validators.required, Validators.min(1)]],
       buildTimeCurrentLevel: [0, Validators.required],
       requirementCurrentLevel: [0, Validators.required],
       bonusCurrentLevel: [0, Validators.required],
     });
   }
 
+  uniqueValidator(config: {
+    controlName: string;
+    alternativeControlName?: string;
+  }): ValidatorFn {
+    return (formArray: AbstractControl): ValidationErrors | null => {
+      const controls = (formArray as FormArray).controls;
+      const values = controls.map((control) => {
+        const mainValue = control.get(config.controlName)?.value;
+        const altValue = config.alternativeControlName
+          ? control.get(config.alternativeControlName)?.value
+          : null;
+        return altValue ? `${mainValue}-${altValue}` : mainValue;
+      });
+      const hasDuplicates = values.some(
+        (value, index) => values.indexOf(value) !== index
+      );
+      return hasDuplicates ? { notUnique: true } : null;
+    };
+  }
+
+  uniqueRequirementValidator(): ValidatorFn {
+    return (formArray: AbstractControl): ValidationErrors | null => {
+      const controls = (formArray as FormArray).controls;
+      const values = controls.map((control) => {
+        const type = control.get('type')?.value;
+        if (type === 'building') {
+          return control.get('buildingId')?.value;
+        } else if (type === 'heroStat') {
+          return control.get('stat')?.value;
+        } else if (type === 'heroLevel') {
+          return control.get('type')?.value; // since heroLevel type only has 'type' as unique key
+        }
+        return null;
+      });
+      const hasDuplicates = values.some(
+        (value, index) => value && values.indexOf(value) !== index
+      );
+      return hasDuplicates ? { notUnique: true } : null;
+    };
+  }
+
   createCostGroup(cost: ICost): FormGroup {
     return this.formBuilder.group({
       resource: [cost.resource, Validators.required],
-      amount: [cost.amount, [Validators.required, Validators.min(0)]],
+      amount: [cost.amount, [Validators.required, Validators.min(1)]],
     });
   }
 
@@ -126,18 +200,18 @@ export class BuildingsModalComponent implements OnInit {
       return this.formBuilder.group({
         type: [requirement.type, Validators.required],
         buildingId: [requirement.buildingId, Validators.required],
-        level: [requirement.level, Validators.required],
+        level: [requirement.level, [Validators.required, Validators.min(1)]],
       });
     } else if (requirement.type === 'heroStat') {
       return this.formBuilder.group({
         type: [requirement.type, Validators.required],
         stat: [requirement.stat, Validators.required],
-        value: [requirement.value, Validators.required],
+        value: [requirement.value, [Validators.required, Validators.min(1)]],
       });
     } else if (requirement.type === 'heroLevel') {
       return this.formBuilder.group({
         type: [requirement.type, Validators.required],
-        value: [requirement.value, Validators.required],
+        value: [requirement.value, [Validators.required, Validators.min(1)]],
       });
     } else {
       throw new Error('Unknown requirement type');
@@ -147,7 +221,7 @@ export class BuildingsModalComponent implements OnInit {
   createBonusGroup(bonus: IBonus): FormGroup {
     return this.formBuilder.group({
       type: [bonus.type, Validators.required],
-      value: [bonus.value, Validators.required],
+      value: [bonus.value, [Validators.required, Validators.min(1)]],
     });
   }
 
@@ -195,12 +269,49 @@ export class BuildingsModalComponent implements OnInit {
     }
   }
 
-  testRequirementsFormula(formula: string, baseRequirement: IRequirement[], level: number) {
-    this.formulasService.calculateRequirementsFormula(formula, baseRequirement, level)
+  testCost() {
+    const formula = this.buildingForm.get('costFormula')?.value;
+    const baseCost = this.buildingForm.get('cost')?.value;
+    const level = this.testForm.get('costCurrentLevel')?.value;
+    this.testResult.cost = this.formulasService.calculateCostFormula(
+      formula,
+      baseCost,
+      level
+    );
   }
 
-  testCostFormula(formula: string, baseCost: ICost[], level: number): void {
-    this.formulasService.calculateCostFormula(formula, baseCost, level);
+  testRequirements() {
+    const formula = this.buildingForm.get('requirementFormula')?.value;
+    const baseRequirements = this.buildingForm.get('requirements')?.value;
+    const level = this.testForm.get('requirementCurrentLevel')?.value;
+    this.testResult.requirements =
+      this.formulasService.calculateRequirementsFormula(
+        formula,
+        baseRequirements,
+        level
+      );
+  }
+
+  testBuildTime() {
+    const formula = this.buildingForm.get('buildTimeFormula')?.value;
+    const baseBuildTime = this.buildingForm.get('buildTime')?.value;
+    const level = this.testForm.get('buildTimeCurrentLevel')?.value;
+    this.testResult.buildTime = this.formulasService.calculateBuildTimeFormula(
+      formula,
+      baseBuildTime,
+      level
+    );
+  }
+
+  testBonuses() {
+    const formula = this.buildingForm.get('bonusFormula')?.value;
+    const baseBonuses = this.buildingForm.get('bonuses')?.value;
+    const level = this.testForm.get('bonusCurrentLevel')?.value;
+    this.testResult.bonuses = this.formulasService.calculateBonusFormula(
+      formula,
+      baseBonuses,
+      level
+    );
   }
 
   onRequirementTypeChange(index: number): void {
@@ -264,8 +375,37 @@ export class BuildingsModalComponent implements OnInit {
     }
   }
 
-  proceed() {
-    this.activeModal.close('proceed');
+  saveBuilding() {
+    if (this.buildingForm.valid) {
+      const updatedBuildingData = this.buildingForm.getRawValue();
+      console.log(
+        updatedBuildingData,
+        this.buildingName
+          .toLowerCase()
+          .replace(/ (.)/g, (match, group1) => group1.toUpperCase())
+      );
+
+      this.firestoreService
+        .updateBuilding(
+          this.buildingName
+            .toLowerCase()
+            .replace(/ (.)/g, (match, group1) => group1.toUpperCase()),
+          updatedBuildingData
+        )
+        .pipe(
+          finalize(() => {
+            console.log('Building update process finalized.');
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.successMessage = 'Building updated successfully!';
+          },
+          error: (error) => {
+            console.error('Error updating building: ', error);
+          },
+        });
+    }
   }
 
   cancel() {
@@ -284,5 +424,4 @@ export class BuildingsModalComponent implements OnInit {
         return `Unknown requirement type`;
     }
   }
-
 }

@@ -18,7 +18,7 @@ import { IUser } from '../../interfaces/general/i-user';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalComponent } from '../../common/confirmation-modal/confirmation-modal.component';
 import { IAttributesDefinition } from '../../interfaces/definitions/i-attributes';
-import { AttributesPanelComponent } from '../attributes-panel/attributes-panel.component';
+import { AttributesPanelComponent } from '../hero/attributes-panel/attributes-panel.component';
 import { IHeroBuildings } from '../../interfaces/hero/i-hero-buildings';
 import {
   Firestore,

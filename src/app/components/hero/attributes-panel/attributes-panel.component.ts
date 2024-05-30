@@ -1,13 +1,13 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { IHeroData } from '../../interfaces/hero/i-hero-data';
-import { IHeroStats } from '../../interfaces/hero/i-hero-stats';
-import { IAttributesDefinition } from '../../interfaces/definitions/i-attributes';
-import { IMetadata } from '../../interfaces/metadata/i-metadata';
-import { FirestoreService } from '../../services/firestore-service';
-import { AuthService } from '../../services/auth-service';
-import { IUser } from '../../interfaces/general/i-user';
+import { IHeroData } from '../../../interfaces/hero/i-hero-data';
+import { IHeroStats } from '../../../interfaces/hero/i-hero-stats';
+import { IAttributesDefinition } from '../../../interfaces/definitions/i-attributes';
+import { IMetadata } from '../../../interfaces/metadata/i-metadata';
+import { FirestoreService } from '../../../services/firestore-service';
+import { AuthService } from '../../../services/auth-service';
+import { IUser } from '../../../interfaces/general/i-user';
 import { NgFor, NgIf } from '@angular/common';
-import { FormulasService } from '../../services/formulas-service';
+import { FormulasService } from '../../../services/formulas-service';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({

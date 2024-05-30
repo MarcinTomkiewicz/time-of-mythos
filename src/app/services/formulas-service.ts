@@ -7,6 +7,7 @@ import {
 } from '../interfaces/definitions/i-requirements';
 import * as math from 'mathjs';
 import { ICost } from '../interfaces/definitions/i-building';
+import { IBonus } from '../interfaces/definitions/i-bonus';
 
 @Injectable({
   providedIn: 'root',
@@ -22,79 +23,6 @@ export class FormulasService {
     );
 
     return cost > 0 ? cost : 1;
-  }
-
-  calculateRequirements(
-    formula: string,
-    level: number,
-    inputRequirementsData: IRequirement[]
-  ): IRequirement[] {
-    const resultRequirements: IRequirement[] = [];
-
-    for (const inputRequirement of inputRequirementsData) {
-      switch (inputRequirement.type) {
-        case 'building':
-          resultRequirements.push(inputRequirement);
-          break;
-        case 'heroStat':
-          const heroStatRequirement = inputRequirement as IHeroStatRequirement;
-          const updatedStatValue = this.calculateStatValue(
-            formula,
-            level,
-            heroStatRequirement.value
-          );
-          resultRequirements.push({
-            type: 'heroStat',
-            stat: heroStatRequirement.stat,
-            value: updatedStatValue,
-          });
-          break;
-        case 'heroLevel':
-          const heroLevelRequirement =
-            inputRequirement as IHeroLevelRequirement;
-          const updatedLevelValue = this.calculateLevelValue(
-            formula,
-            level,
-            heroLevelRequirement.value
-          );
-          resultRequirements.push({
-            type: 'heroLevel',
-            value: updatedLevelValue,
-          });
-          break;
-        default:
-          resultRequirements.push(inputRequirement);
-          break;
-      }
-    }
-
-    return resultRequirements;
-  }
-
-  private calculateStatValue(
-    formula: string,
-    level: number,
-    baseValue: number
-  ): number {
-    const substitutedFormula = formula.replace(
-      /BaseStat/g,
-      baseValue.toString()
-    );
-    const result = math.evaluate(substitutedFormula, { level: level });
-    return Number(result);
-  }
-
-  private calculateLevelValue(
-    formula: string,
-    level: number,
-    baseValue: number
-  ): number {
-    const substitutedFormula = formula.replace(
-      /BaseLevel/g,
-      baseValue.toString()
-    );
-    const result = math.evaluate(substitutedFormula, { level: level });
-    return Number(result);
   }
 
   calculateCostFormula(formula: string, base: ICost[], level: number): ICost[] {
@@ -115,9 +43,20 @@ export class FormulasService {
       });
     }
 
-    console.log(resultDataArray);
-
     return resultDataArray;
+  }
+
+  calculateBuildTimeFormula(
+    formula: string,
+    baseBuildTime: number,
+    level: number
+  ): number {
+    let convertedFormula = formula
+      .replaceAll(/baseBuildTime/g, baseBuildTime.toString())
+      .replaceAll(/level/g, level.toString());
+    console.log(math.evaluate(convertedFormula));
+
+    return math.evaluate(convertedFormula);
   }
 
   calculateRequirementsFormula(
@@ -153,5 +92,29 @@ export class FormulasService {
 
       return newItem;
     });
+  }
+
+  calculateBonusFormula(
+    formula: string,
+    baseBonus: IBonus[],
+    level: number
+  ): IBonus[] {
+    let resultDataArray: IBonus[] = [];
+
+    for (let bonus of baseBonus) {
+      let baseBonus = bonus.value;
+
+      let convertedFormula = formula
+        .replaceAll(/baseBonus/g, baseBonus.toString())
+        .replaceAll(/level/g, level.toString());
+
+      let newBonus = math.evaluate(convertedFormula);
+
+      resultDataArray.push({
+        ...bonus,
+        value: newBonus,
+      });
+    }
+    return resultDataArray;
   }
 }

@@ -2,6 +2,18 @@
   <h4 class="modal-title text-uppercase">{{ buildingName }}</h4>
 </div>
 <div class="modal-body">
+  <ngb-alert
+    *ngIf="errorMessage !== ''"
+    type="danger"
+    (close)="errorMessage = ''"
+    >{{ errorMessage }}</ngb-alert
+  >
+  <ngb-alert
+    *ngIf="successMessage !== ''"
+    type="success"
+    (close)="successMessage = ''"
+    >{{ successMessage }}</ngb-alert
+  >
   <form
     *ngIf="buildingForm"
     [formGroup]="buildingForm"
@@ -82,11 +94,11 @@
               *ngIf="reqGroup.get('buildingId')"
               class="d-flex flex-row gap-2"
             >
-              <input
-                type="text"
-                formControlName="buildingId"
-                placeholder="Building ID"
-              />
+            <select formControlName="buildingId">
+              <option *ngFor="let key of buildingsKeys" [value]="key">
+                {{ buildingsMetadata[key].displayName || key }}
+              </option>
+            </select>
               <input
                 type="number"
                 formControlName="level"
@@ -187,16 +199,25 @@
                   class="w-50"
                 />
               </div>
-              <div class="d-flex flex-row justify-content-between w-100">
-                <div>Next level Cost:</div>
-                <input
-                  type="text"
-                  [value]="testResult.cost"
-                  disabled
-                  class="w-50"
-                />
+              <div class="d-flex flex-column w-100">
+                <div class="d-flex flex-row justify-content-between mb-2">
+                  <div>Next level Costs:</div>
+                  <ng-container *ngFor="let cost of testResult.cost">
+                    <div class="d-flex flex-row justify-content-between">
+                      <div>{{ cost.resource }}:</div>
+                      <input
+                        type="text"
+                        [value]="cost.amount"
+                        disabled
+                        class="w-50"
+                      />
+                    </div>
+                  </ng-container>
+                </div>
               </div>
-              <button type="button" class="btn" (click)="testCostFormula(buildingForm.get('costFormula')?.value, buildingForm.get('cost')?.value, testForm.get('costCurrentLevel')?.value)">Test</button>
+              <button type="button" class="btn" (click)="testCost()">
+                Test
+              </button>
             </form>
           </div>
         </div>
@@ -229,16 +250,22 @@
                   class="w-50"
                 />
               </div>
-              <div class="d-flex flex-row justify-content-between w-100">
-                <div>Next level Build Time:</div>
-                <input
-                  type="text"
-                  [value]="testResult.buildTime"
-                  disabled
-                  class="w-50"
-                />
+              <div class="d-flex flex-column w-100">
+                <div class="d-flex flex-row justify-content-between mb-2">
+                  <div class="d-flex flex-row justify-content-between">
+                    <div>Next level Build Time:</div>
+                    <input
+                      type="text"
+                      [value]="testResult.buildTime"
+                      disabled
+                      class="w-50"
+                    />
+                  </div>
+                </div>
               </div>
-              <button type="button" class="btn" disabled>Test</button>
+              <button type="button" class="btn" (click)="testBuildTime()">
+                Test
+              </button>
             </form>
           </div>
         </div>
@@ -267,20 +294,53 @@
                 <div>Current level:</div>
                 <input
                   type="number"
+                  [min]="1"
+                  [value]="1"
                   formControlName="requirementCurrentLevel"
                   class="w-50"
                 />
               </div>
-              <div class="d-flex flex-row justify-content-between w-100">
-                <div>Next level Requirements:</div>
-                <input
-                  type="text"
-                  [value]="testResult.requirement"
-                  disabled
-                  class="w-50"
-                />
+              <div class="d-flex flex-column w-100">
+                <div class="d-flex flex-row justify-content-between mb-2">
+                  <div>Next level Requirements:</div>
+                  <ng-container
+                    *ngFor="let requirement of testResult.requirements"
+                  >
+                    <div
+                      class="d-flex flex-column justify-content-between align-items-center"
+                    >
+                      <div>{{ requirement.type }}:</div>
+                      <input
+                        *ngIf="
+                          requirement.type === 'building' ||
+                          requirement.type === 'heroStat'
+                        "
+                        type="text"
+                        [value]="
+                          requirement.type === 'building'
+                            ? requirement.buildingId
+                            : requirement.stat
+                        "
+                        disabled
+                        class="w-50"
+                      />
+                      <input
+                        type="text"
+                        [value]="
+                          requirement.type === 'building'
+                            ? requirement.level
+                            : requirement.value
+                        "
+                        disabled
+                        class="w-50"
+                      />
+                    </div>
+                  </ng-container>
+                </div>
               </div>
-              <button type="button" class="btn" (click)="testRequirementsFormula(buildingForm.get('requirementFormula')?.value, buildingForm.get('requirements')?.value, testForm.get('requirementCurrentLevel')?.value)">Test</button>
+              <button type="button" class="btn" (click)="testRequirements()">
+                Test
+              </button>
             </form>
           </div>
         </div>
@@ -309,16 +369,25 @@
                   class="w-50"
                 />
               </div>
-              <div class="d-flex flex-row justify-content-between w-100">
-                <div>Next level Bonus:</div>
-                <input
-                  type="text"
-                  [value]="testResult.bonus"
-                  disabled
-                  class="w-50"
-                />
+              <div class="d-flex flex-column w-100">
+                <div class="d-flex flex-row justify-content-between mb-2">
+                  <div>Next level Bonuses:</div>
+                  <ng-container *ngFor="let bonus of testResult.bonuses">
+                    <div class="d-flex flex-row justify-content-between">
+                      <div>{{ bonus.type }}:</div>
+                      <input
+                        type="text"
+                        [value]="bonus.value"
+                        disabled
+                        class="w-50"
+                      />
+                    </div>
+                  </ng-container>
+                </div>
               </div>
-              <button type="button" class="btn" disabled>Test</button>
+              <button type="button" class="btn" (click)="testBonuses()">
+                Test
+              </button>
             </form>
           </div>
         </div>
@@ -347,7 +416,7 @@
       type="submit"
       [disabled]="buildingForm && buildingForm.invalid"
       class="btn"
-      (click)="proceed()"
+      (click)="saveBuilding()"
     >
       Proceed
     </button>

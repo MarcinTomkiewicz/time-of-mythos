@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MainContentComponent } from './components/main-content/main-content.component';
 import { CreateCharacterComponent } from './components/create-character/create-character.component';
-import { AttributesPanelComponent } from './components/attributes-panel/attributes-panel.component';
+import { AttributesPanelComponent } from './components/hero/attributes-panel/attributes-panel.component';
 import { ManageBuildingsComponent } from './admin/manage-buildings/manage-buildings.component';
 
 const gameRoutes: Routes = [

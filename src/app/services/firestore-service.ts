@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { IMetadata } from '../interfaces/metadata/i-metadata';
 import { Firestore, getDoc, doc } from '@angular/fire/firestore';
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
@@ -9,6 +9,7 @@ import {
   PartialWithFieldValue,
   setDoc,
 } from 'firebase/firestore';
+import { IBuilding } from '../interfaces/definitions/i-building';
 
 @Injectable({
   providedIn: 'root',
@@ -110,5 +111,14 @@ export class FirestoreService {
     const storage = getStorage();
     const storageRef = ref(storage, imagePath);
     return getDownloadURL(storageRef);
+  }
+
+
+  updateBuilding(buildingName: string, buildingData: IBuilding): Observable<void> {
+    const buildingRef = doc(this.firestore, 'definitions/buildings');
+    const updateData = {
+      [buildingName]: buildingData,
+    };
+    return from(setDoc(buildingRef, updateData, { merge: true }));
   }
 }

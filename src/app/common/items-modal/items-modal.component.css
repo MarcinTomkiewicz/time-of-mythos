@@ -1,0 +1,27 @@
+.modal-header, .modal-body, .modal-footer {
+    background-color: rgba(127, 191, 255, 0.8)!important;
+}
+
+.btn {
+    padding: 2px;
+    flex-shrink: 1;
+    width: max-content;
+    min-width: unset;
+}
+
+.btn::before {
+    transform: translate(0, -3%);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  div {
+    margin-bottom: 10px;
+  }
+  
+  label {
+    margin-right: 10px;
+  }

@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { AuthService } from './auth-service';
 import { IMenuItems } from '../interfaces/general/i-menu';
-import { switchMap } from 'rxjs/operators'; // Importuje switchMap
+import { map, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { IUser } from '../interfaces/general/i-user';
 
 @Injectable({
   providedIn: 'root',
@@ -54,4 +53,24 @@ export class MenuService {
       })
     );
   }
+  
+  getAdminMenuItems(): Observable<IMenuItems[]> {
+    return this.authService.getUser().pipe(
+      map(user => {
+        if (user && user.isAdmin) {
+          const adminRoutes: IMenuItems[] = [
+            { label: 'Manage Buildings', url: '/admin/manage-buildings' },
+            { label: 'Manage Items', url: '/admin/manage-items' },
+          ];
+          return adminRoutes.map((adminRoute) => ({
+            label: adminRoute.label,
+            url: this.router.createUrlTree([adminRoute.url]).toString(),
+          }));
+        } else {
+          return [];
+        }
+      })
+    );
+  }
 }
+

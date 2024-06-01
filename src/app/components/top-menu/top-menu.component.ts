@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { IMenuItems } from '../../interfaces/general/i-menu';
 import { MenuService } from '../../services/menu-service';
 import { RouterLink } from '@angular/router';
@@ -9,17 +9,25 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [NgIf, NgFor, RouterLink],
   templateUrl: './top-menu.component.html',
-  styleUrl: './top-menu.component.css'
+  styleUrls: ['./top-menu.component.css']
 })
 export class TopMenuComponent implements OnInit {
+  
+  @Input() isAdminMenu: boolean = false;
 
   menuItems?: IMenuItems[];
 
   constructor(private menuService: MenuService) { }
 
   ngOnInit(): void {
-    this.menuService.getMenuItems().subscribe(menuItems => {
-      this.menuItems = menuItems;
-    });
+    if (this.isAdminMenu) {
+      this.menuService.getAdminMenuItems().subscribe(adminMenuItems => {
+        this.menuItems = adminMenuItems;
+      });
+    } else {
+      this.menuService.getMenuItems().subscribe(menuItems => {
+        this.menuItems = menuItems;
+      });
+    }
   }
 }

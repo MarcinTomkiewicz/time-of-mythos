@@ -19,6 +19,10 @@
     </ng-template>
   </div>
 
+  <div class="menu-wrapper" *ngIf="user?.isAdmin">
+    <app-top-menu class="menu" [isAdminMenu]="true"></app-top-menu>
+    </div>
+
   <div class="inner-wrapper">
     <div class="left">
       <div class="vertical-div"><app-user-panel></app-user-panel></div>

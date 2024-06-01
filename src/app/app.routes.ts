@@ -6,6 +6,7 @@ import { AttributesPanelComponent } from './components/hero/attributes-panel/att
 import { ManageBuildingsComponent } from './admin/manage-buildings/manage-buildings.component';
 import { HeroBuildingsComponent } from './components/hero/hero-buildings/hero-buildings.component';
 import { HeroDashboardComponent } from './components/hero/hero-dashboard/hero-dashboard.component';
+import { ManageItemsComponent } from './admin/manage-items/manage-items.component';
 
 const gameRoutes: Routes = [
   { path: 'dashboard', component: HeroDashboardComponent },
@@ -30,6 +31,7 @@ const homeRoutes: Routes = [
 
 const adminRoutes: Routes = [
   {path: 'admin/manage-buildings', component: ManageBuildingsComponent},
+  {path: 'admin/manage-items', component: ManageItemsComponent},
 ]
 
 export const routes: Routes = [

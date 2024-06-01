@@ -23,7 +23,6 @@
     height: 100%;
     border-radius: 5px;
     background: linear-gradient(to right top, #e79b6a 20%, #fff1c0);
-    /* transform: translate(0, -16%); */
     animation: out 0.2s cubic-bezier(1, 0, 0.58, 0.97) 1 both;
     z-index: -1;
   }
@@ -31,10 +30,6 @@
   .card:hover:before {
     animation: in 0.2s cubic-bezier(1, 0, 0.58, 0.97) 1 both;
   }
-  
-  /* .card:hover {
-    color: #f5f5f5 !important;
-  } */
   
   @keyframes in {
     0% {

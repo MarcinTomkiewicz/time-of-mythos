@@ -5,9 +5,10 @@ import { CreateCharacterComponent } from './components/create-character/create-c
 import { AttributesPanelComponent } from './components/hero/attributes-panel/attributes-panel.component';
 import { ManageBuildingsComponent } from './admin/manage-buildings/manage-buildings.component';
 import { HeroBuildingsComponent } from './components/hero/hero-buildings/hero-buildings.component';
+import { HeroDashboardComponent } from './components/hero/hero-dashboard/hero-dashboard.component';
 
 const gameRoutes: Routes = [
-  { path: 'dashboard', component: MainContentComponent },
+  { path: 'dashboard', component: HeroDashboardComponent },
   { path: 'attributes', component: AttributesPanelComponent },
   { path: 'challenges', component: MainContentComponent },
   { path: 'combat', component: MainContentComponent },

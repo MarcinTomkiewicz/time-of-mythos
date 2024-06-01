@@ -166,8 +166,8 @@ export class CreateCharacterComponent {
       originId: '',
       rankName: 'perioecus',
       rankId: 1,
-      hp: 1,
-      defense: 0,
+      hp: 100,
+      defense: 10,
       luck: 0,
       allianceID: 0,
     };

@@ -29,6 +29,7 @@ export class FirestoreService {
           if (snapshot.exists()) {
             const data = snapshot.data() as T;
             observer.next(data);
+            observer.complete();
           }
         })
         .catch((error) => {
@@ -74,6 +75,7 @@ export class FirestoreService {
               idKey
             );
             observer.next(processedData);
+            observer.complete();
           }
         })
         .catch((error) => {

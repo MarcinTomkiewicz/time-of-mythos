@@ -6,6 +6,8 @@ export interface IHeroData {
     originId: string;
     rankName: string;
     rankId: number;
+    minDamage: number;
+    maxDamage: number;
     hp: number;
     defense: number;
     luck: number;

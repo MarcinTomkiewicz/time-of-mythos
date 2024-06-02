@@ -4,6 +4,7 @@ import {
   AbstractControl,
   FormArray,
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   ValidationErrors,
@@ -28,6 +29,7 @@ import { IBonus } from '../../interfaces/definitions/i-bonus';
 export class ItemsModalComponent {
   @Input() itemType!: 'weapon' | 'armor' | 'jewelry' | 'prefix' | 'suffix';
   itemForm!: FormGroup;
+  canAppearOnForm!: FormGroup;
   resourcesMetadata!: { [key: string]: IMetadata };
   attributesMetadata!: { [key: string]: IMetadata };
   bonusesMetadata!: { [key: string]: IMetadata };
@@ -38,9 +40,15 @@ export class ItemsModalComponent {
   buildingsKeys: string[] = [];
   itemTypes: string[] = [];
   selectedFile!: File;
+  weaponsTypes: string[] = ['1h', '2h', 'Range', 'Throwing', 'Tactical'];
+  armorTypes: string[] = ['Head', 'Chest', 'Feet', 'Hands', 'Legs'];
+  jewelryTypes: string[] = ['Ring', 'Amulet'];
+  weaponsControl: FormControl = new FormControl(false);
+  armorControl: FormControl = new FormControl(false);
+  jewelryControl: FormControl = new FormControl(false);
 
   constructor(
-    public modal: NgbActiveModal,
+    public activeModal: NgbActiveModal,
     private fb: FormBuilder,
     private firestoreService: FirestoreService,
     private formulasService: FormulasService
@@ -77,20 +85,25 @@ export class ItemsModalComponent {
       },
     });
 
-    if (this.itemType === 'weapon') {
-      this.itemTypes = [
-        'Sword',
-        'Curved Sword',
-        'Knife',
-        'Spear',
-        'Javelin',
-        'Short Sword',
-        'Dagger',
-        'Double Axe',
-        'Single Axe',
-        'Long Dagger',
-      ];
-    }
+    switch (this.itemType) {
+      case 'weapon':
+        this.itemTypes = this.weaponsTypes;
+        break;
+      case 'armor':
+        this.itemTypes = this.armorTypes;
+        break;
+      case 'jewelry':
+        this.itemTypes = this.jewelryTypes;
+        break;
+      case 'prefix':
+        this.itemTypes = [...this.weaponsTypes, ...this.armorTypes, ...this.jewelryTypes];
+        break;
+      case 'suffix':
+        this.itemTypes = [...this.weaponsTypes, ...this.armorTypes, ...this.jewelryTypes];
+        break;
+      default:
+        break;
+    }    
   }
 
   initializeForm() {
@@ -105,36 +118,47 @@ export class ItemsModalComponent {
       icon: [null, Validators.required],
       minDamage: [0],
       maxDamage: [0],
-      defense: [0], 
+      defense: [0],
+      canAppearOn: this.fb.array([]),
     });
 
     this.itemForm.get('type')?.valueChanges.subscribe((value) => {
       this.onTypeChange(value);
     });
+
+
+    this.canAppearOnForm = this.fb.group({
+      weapon: false,
+      armor: false,
+      jewelry: false
+    });
   }
 
-  onTypeChange(type: string): void {
-    const minDamageControl = this.itemForm.get('minDamage');
-    const maxDamageControl = this.itemForm.get('maxDamage');
-    const defenseControl = this.itemForm.get('defense');
+  get canAppearOnControls() {
+    return this.canAppearOnForm.controls;
+  }
 
-    if (type === 'Weapon') {
-      minDamageControl?.setValidators([Validators.required]);
-      maxDamageControl?.setValidators([Validators.required]);
-      defenseControl?.clearValidators();
-    } else if (type === 'Armor') {
-      defenseControl?.setValidators([Validators.required]);
-      minDamageControl?.clearValidators();
-      maxDamageControl?.clearValidators();
-    } else {
-      minDamageControl?.clearValidators();
-      maxDamageControl?.clearValidators();
-      defenseControl?.clearValidators();
+  onTypeChange(type: string) {
+    this.itemForm.get('minDamage')?.clearValidators();
+    this.itemForm.get('maxDamage')?.clearValidators();
+    this.itemForm.get('defense')?.clearValidators();
+    this.itemForm.get('canAppearOn')?.clearValidators();
+
+    if (type === 'weapon') {
+      console.log(type);
+      this.itemForm.get('minDamage')?.setValidators([Validators.required, Validators.min(0)]);
+      this.itemForm.get('maxDamage')?.setValidators([Validators.required, Validators.min(0)]);
+    } else if (type === 'armor') {
+      this.itemForm.get('defense')?.setValidators([Validators.required, Validators.min(0)]);
+    } else if (type === 'prefix' || type === 'suffix') {
+      console.log("Hello");
+      
     }
 
-    minDamageControl?.updateValueAndValidity();
-    maxDamageControl?.updateValueAndValidity();
-    defenseControl?.updateValueAndValidity();
+    this.itemForm.get('minDamage')?.updateValueAndValidity();
+    this.itemForm.get('maxDamage')?.updateValueAndValidity();
+    this.itemForm.get('defense')?.updateValueAndValidity();
+    this.itemForm.get('canAppearOn')?.updateValueAndValidity();
   }
 
   uniqueValidator(config: {
@@ -280,12 +304,16 @@ export class ItemsModalComponent {
         });
       };
       console.log(this.itemForm.get('profilePicture')?.value);
-      
+
       reader.readAsDataURL(this.selectedFile);
     }
   }
 
   onSubmit(): void {
     console.log(this.itemForm.value);
+  }
+
+  cancel() {
+    this.activeModal.dismiss('cancel');
   }
 }

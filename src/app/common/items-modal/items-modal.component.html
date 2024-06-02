@@ -7,11 +7,11 @@
       <div class="d-flex flex-row justify-content-between w-100">
         <div>Name:</div>
         <div class="w-50">
-          <input type="number" formControlName="name" />
+          <input type="text" formControlName="name" />
         </div>
       </div>
 
-      <div class="d-flex flex-row justify-content-between w-100">
+      <div class="d-flex flex-row justify-content-between w-100" *ngIf="itemType === 'armor' || itemType === 'weapon' || itemType === 'jewelry'">
         <div>Type:</div>
         <div class="w-50">
           <select formControlName="type">
@@ -22,7 +22,19 @@
         </div>
       </div>
 
-      <div class="d-flex flex-row justify-content-between w-100">
+      <div *ngIf="itemType === 'prefix' || itemType === 'suffix'" class="d-flex flex-row justify-content-between w-100">
+        <div>Can Appear On:</div>
+        <div class="w-50">
+          <input type="checkbox" [formControl]="weaponsControl">
+          <label for="weapons">Weapons</label>
+          <input type="checkbox" [formControl]="armorControl">
+          <label for="armor">Armor</label>
+          <input type="checkbox" [formControl]="jewelryControl">
+          <label for="jewelry">Jewelry</label>
+        </div>
+      </div>
+
+      <div class="d-flex flex-row justify-content-between w-100" *ngIf="itemType === 'prefix' || itemType === 'suffix'">
         <label for="isSetItem">Is Set Item:</label>
         <div class="w-50">
           <input id="isSetItem" type="checkbox" formControlName="isSetItem" />
@@ -30,7 +42,7 @@
       </div>
 
       <div
-        *ngIf="itemForm.get('isSetItem')?.value"
+        *ngIf="itemForm.get('isSetItem')?.value && itemType === 'prefix' || itemType === 'suffix'"
         class="d-flex flex-row justify-content-between w-100"
       >
         <div>Set Name:</div>
@@ -172,7 +184,7 @@
         </div>
       </div>
 
-      <div class="d-flex flex-row justify-content-between w-100">
+      <div class="d-flex flex-row justify-content-between w-100" *ngIf="itemType !== 'prefix' && itemType !== 'suffix'">
         <div>Icon:</div>
         <div class="d-flex flex-row justify-content-start gap-2 w-50">
           <input type="file" formControlName="icon" class="form-control-file" (change)="onFileSelect($event)" accept="image/*">
@@ -181,9 +193,17 @@
           </div>
         </div>
       </div>
-
-
-      <button type="submit">Submit</button>
     </div>
   </form>
+</div>
+<div class="modal-footer">
+  <button
+    type="submit"
+    [disabled]="itemForm && itemForm.invalid"
+    class="btn"
+    (click)="onSubmit()"
+  >
+    Proceed
+  </button>
+  <button type="button" class="btn" (click)="cancel()">Cancel</button>
 </div>

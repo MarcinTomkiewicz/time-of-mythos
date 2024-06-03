@@ -46,6 +46,7 @@ export class ItemsModalComponent {
   weaponsControl: FormControl = new FormControl(false);
   armorControl: FormControl = new FormControl(false);
   jewelryControl: FormControl = new FormControl(false);
+  canAppearOnOptions: FormControl = new FormControl([]);
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -109,33 +110,54 @@ export class ItemsModalComponent {
   initializeForm() {
     this.itemForm = this.fb.group({
       name: ['', Validators.required],
-      type: ['', Validators.required],
-      isSetItem: [false],
-      setName: [''],
+      type: [''],
       requirements: this.fb.array([]),
       bonuses: this.fb.array([]),
       value: [0, Validators.required],
-      icon: [null, Validators.required],
-      minDamage: [0],
-      maxDamage: [0],
-      defense: [0],
-      canAppearOn: this.fb.array([]),
     });
 
     this.itemForm.get('type')?.valueChanges.subscribe((value) => {
       this.onTypeChange(value);
     });
+    
+    if(this.itemType === 'weapon') {
+      this.itemForm.addControl('minDamage', new FormControl(0));
+      this.itemForm.addControl('maxDamage', new FormControl(0));
+      this.itemForm.addControl('icon', new FormControl(null));
+    }
 
+    if (this.itemType === 'armor') {
+      this.itemForm.addControl('defense', new FormControl(0));
+      this.itemForm.addControl('icon', new FormControl(null));
+    }
 
-    this.canAppearOnForm = this.fb.group({
-      weapon: false,
-      armor: false,
-      jewelry: false
-    });
-  }
+    if (this.itemType === 'jewelry') {
+      this.itemForm.addControl('icon', new FormControl(null));
+    }
 
-  get canAppearOnControls() {
-    return this.canAppearOnForm.controls;
+    if (this.itemType === 'prefix' || this.itemType === 'suffix') {
+      this.itemForm.addControl('isSetItem', new FormControl(false));
+      this.itemForm.addControl('setName', new FormControl(''));
+      this.itemForm.addControl('canAppearOn', this.fb.group({
+        weapon: [],
+        armor: [],
+        jewelry: [],
+      })
+    );
+    } else {
+      this.itemForm.removeControl('canAppearOn');
+      this.itemForm.removeControl('isSetItem');
+      this.itemForm.removeControl('setName');
+    }
+    
+    if (this.itemType === 'prefix' || this.itemType === 'suffix') {
+      this.canAppearOnOptions = this.fb.control([]);
+      this.itemForm.addControl('options', this.canAppearOnOptions);
+  
+      this.canAppearOnOptions.valueChanges.subscribe((value) => {
+        this.updateCanAppearOn(value);
+      });
+    }
   }
 
   onTypeChange(type: string) {
@@ -145,20 +167,80 @@ export class ItemsModalComponent {
     this.itemForm.get('canAppearOn')?.clearValidators();
 
     if (type === 'weapon') {
-      console.log(type);
       this.itemForm.get('minDamage')?.setValidators([Validators.required, Validators.min(0)]);
       this.itemForm.get('maxDamage')?.setValidators([Validators.required, Validators.min(0)]);
     } else if (type === 'armor') {
       this.itemForm.get('defense')?.setValidators([Validators.required, Validators.min(0)]);
     } else if (type === 'prefix' || type === 'suffix') {
-      console.log("Hello");
+
+      this.itemForm.addControl('canAppearOn', this.fb.group({
+        weapon: [],
+        armor: [],
+        jewelry: [],
+      }));
       
     }
-
     this.itemForm.get('minDamage')?.updateValueAndValidity();
     this.itemForm.get('maxDamage')?.updateValueAndValidity();
     this.itemForm.get('defense')?.updateValueAndValidity();
     this.itemForm.get('canAppearOn')?.updateValueAndValidity();
+    this.itemForm.get('isSetItem')?.updateValueAndValidity();
+    this.itemForm.get('setName')?.updateValueAndValidity();
+  }
+
+  updateCanAppearOn(selectedOptions: string[]) {
+    const canAppearOnFormGroup = this.itemForm.get('canAppearOn') as FormGroup;
+  
+    Object.keys(canAppearOnFormGroup.controls).forEach((key) => {
+      const control = canAppearOnFormGroup.get(key) as FormArray;
+      if (selectedOptions.includes(this.capitalizeFirstLetter(key))) {
+        control.setValidators(Validators.required);
+      } else {
+        control.clearValidators();
+        control.reset([]);
+      }
+    });
+  
+    canAppearOnFormGroup.updateValueAndValidity();
+  }
+  
+  onCheckboxChange(type: string, event: any) {
+    const options = this.canAppearOnOptions.value;
+    if (event.target.checked) {
+      options.push(type);
+    } else {
+      const index = options.indexOf(type);
+      if (index > -1) {
+        options.splice(index, 1);
+      }
+    }
+    this.canAppearOnOptions.setValue(options);
+  }
+  
+  capitalizeFirstLetter(string: string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+  
+  addCanAppearOnControl(type: string) {
+    const canAppearOn = this.itemForm.get('canAppearOn') as FormGroup;
+    canAppearOn.addControl(type, this.fb.array([]));
+  }
+  
+  removeCanAppearOnControl(type: string) {
+    const canAppearOn = this.itemForm.get('canAppearOn') as FormGroup;
+    canAppearOn.removeControl(type);
+  }
+  
+  get weaponsArray(): FormControl {
+    return this.itemForm.get(['canAppearOn', 'weapon']) as FormControl;
+  }
+  
+  get armorArray(): FormControl {
+    return this.itemForm.get(['canAppearOn', 'armor']) as FormControl;
+  }
+  
+  get jewelryArray(): FormControl {
+    return this.itemForm.get(['canAppearOn', 'jewelry']) as FormControl;
   }
 
   uniqueValidator(config: {
@@ -199,6 +281,22 @@ export class ItemsModalComponent {
         (value, index) => value && values.indexOf(value) !== index
       );
       return hasDuplicates ? { notUnique: true } : null;
+    };
+  }
+
+  atLeastOneArrayHasValue(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const group = control as FormGroup;
+      const weaponsArray = group.get('weapon') as FormArray;
+      const armorArray = group.get('armor') as FormArray;
+      const jewelryArray = group.get('jewelry') as FormArray;
+  
+      const hasValue = (arr: FormArray) => arr && arr.controls.length > 0;
+  
+      if (hasValue(weaponsArray) || hasValue(armorArray) || hasValue(jewelryArray)) {
+        return null;
+      }
+      return { atLeastOneArrayHasValue: true };
     };
   }
 
@@ -303,8 +401,6 @@ export class ItemsModalComponent {
           icon: reader.result,
         });
       };
-      console.log(this.itemForm.get('profilePicture')?.value);
-
       reader.readAsDataURL(this.selectedFile);
     }
   }

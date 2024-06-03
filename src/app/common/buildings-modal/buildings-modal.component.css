@@ -10,5 +10,5 @@
 }
 
 .btn::before {
-    transform: translate(0, -3%);
+    transform: translate(0, -13%);
 }

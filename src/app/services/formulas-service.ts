@@ -92,9 +92,12 @@ export class FormulasService {
       let convertedFormula = formula
         .replaceAll(/baseBonus/g, baseBonusValue.toString())
         .replaceAll(/level/g, level.toString());
-  
-      let newBonusValue = Math.max(1, Math.floor(math.evaluate(convertedFormula))); // Zabezpieczenie, że wartość wynikowa będzie przynajmniej 1
-  
+
+        
+        
+        let newBonusValue = Math.max(1, Math.floor(math.evaluate(convertedFormula)));
+        
+        console.log(math.evaluate(convertedFormula), baseBonusValue, newBonusValue);
       resultDataArray.push({
         ...bonus,
         value: newBonusValue,

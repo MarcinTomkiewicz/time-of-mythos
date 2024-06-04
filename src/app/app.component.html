@@ -12,10 +12,11 @@
       <app-auth-forms [isInTopBar]="true" [emailId]="'emailTop'" [passwordId]="'passwordTop'"></app-auth-forms>
     </ng-container>
     <ng-template #loggedInTemplate>
-      <div class="d-flex flex-row align-items-center gap-2">
+      <app-resources-bar></app-resources-bar>
+      <!-- <div class="d-flex flex-row align-items-center gap-2">
         <div>Hello, {{user?.name}} </div>
         <button type="submit" class="btn" (click)="logout()">Log out</button>
-      </div>
+      </div> -->
     </ng-template>
   </div>
 

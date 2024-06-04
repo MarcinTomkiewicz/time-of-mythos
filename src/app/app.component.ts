@@ -9,6 +9,7 @@ import { MainContentComponent } from './components/main-content/main-content.com
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
 import { IUser } from './interfaces/general/i-user';
 import { User } from 'firebase/auth';
+import { ResourcesBarComponent } from './components/hero/resources-bar/resources-bar.component';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ import { User } from 'firebase/auth';
     AuthFormsComponent,
     MainContentComponent,
     SideMenuComponent,
+    ResourcesBarComponent
   ],
   providers: [AuthService],
 })

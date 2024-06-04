@@ -1,0 +1,34 @@
+<div class="d-flex flex-column gap-2 justify-content-center" *ngIf="heroResources">
+  <div
+    class="d-flex justify-content-between align-items-center w-100 flex-row gap-2"
+  >
+    <div>
+      <span style="font-weight: bold">Drachma:</span>
+      {{ heroResources["drachma"] }}
+    </div>
+    <div>
+      <span style="font-weight: bold">Materials:</span>
+      {{ heroResources["materials"] }}
+    </div>
+    <div>
+      <span style="font-weight: bold">Workforce:</span>
+      {{ heroResources["workforce"] }}
+    </div>
+  </div>
+  <div
+    class="d-flex justify-content-between align-items-center w-100 flex-row gap-2"
+  >
+    <div>
+      <span style="font-weight: bold">Drachma growth:</span>
+      {{ resourcesGrowth["drachma"] }}/h
+    </div>
+    <div>
+      <span style="font-weight: bold">Materials growth:</span>
+      {{ resourcesGrowth["materials"] }}/h
+    </div>
+    <div>
+      <span style="font-weight: bold">Workforce growth:</span>
+      {{ resourcesGrowth["workforce"] }}/h
+    </div>
+  </div>
+</div>

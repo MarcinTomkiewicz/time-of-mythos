@@ -28,7 +28,7 @@ export class FirestoreService {
         .then((snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data() as T;
-            observer.next(data);
+            observer.next(data);           
             observer.complete();
           }
         })

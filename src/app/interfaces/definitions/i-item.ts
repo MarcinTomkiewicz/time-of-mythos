@@ -2,6 +2,7 @@ import { IBonus } from "./i-bonus";
 import { IRequirement } from "./i-requirements";
 
 export interface IItem {
+    id: number;
     name: string;
     type: string;
     isSetItem: boolean;
@@ -22,6 +23,7 @@ export interface IItem {
   }
 
   export interface IPrefix {
+    id: number;
     name: string;
     type: string;
     isPartOfSet: boolean;
@@ -33,6 +35,7 @@ export interface IItem {
   }
 
   export interface ISuffix {
+    id: number;
     name: string;
     type: string;
     requirements: IRequirement[];

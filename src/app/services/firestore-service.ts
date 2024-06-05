@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { IMetadata } from '../interfaces/metadata/i-metadata';
-import { Firestore, getDoc, doc } from '@angular/fire/firestore';
-import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
+import { Firestore, getDoc, doc, setDoc, addDoc, collection, updateDoc } from '@angular/fire/firestore';
+import { getDownloadURL, getStorage, ref, uploadBytes } from '@angular/fire/storage';
 import { DataProcessingService } from './data-processing-service';
 import {
   DocumentData,
   PartialWithFieldValue,
-  setDoc,
 } from 'firebase/firestore';
 import { IBuilding } from '../interfaces/definitions/i-building';
+import { IArmor, IItem, IPrefix, ISuffix, IWeapon } from '../interfaces/definitions/i-item';
 
 @Injectable({
   providedIn: 'root',
@@ -124,5 +124,50 @@ export class FirestoreService {
       [buildingName]: buildingData,
     };
     return from(setDoc(buildingRef, updateData, { merge: true }));
+  }
+
+  createItem(documentPath: string, item: IItem | IWeapon | IArmor | IPrefix | ISuffix): Observable<void> {
+    return new Observable<void>((observer) => {
+      const docRef = doc(this.firestore, documentPath);
+      updateDoc(docRef, { [item.name.toLowerCase()]: item })
+        .then(() => {
+          observer.next();
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
+  updateItem(collectionPath: string, itemId: number, item: Partial<IItem | IWeapon | IArmor | IPrefix | ISuffix>): Observable<void> {
+    return new Observable<void>((observer) => {
+      const docRef = doc(this.firestore, `${collectionPath}/${itemId}`);
+      updateDoc(docRef, item)
+        .then(() => {
+          observer.next();
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
+  uploadFile(file: File, itemType: string): Observable<string> {
+    const storage = getStorage();
+    const filePath = `items/${itemType}/${file.name}`;
+    const fileRef = ref(storage, filePath);
+    return new Observable<string>((observer) => {
+      uploadBytes(fileRef, file)
+        .then(() => getDownloadURL(fileRef))
+        .then((url) => {
+          observer.next(url);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
   }
 }

@@ -1,22 +1,24 @@
 <h4>Attributes</h4>
-<div class="attributes-panel" *ngIf="heroData && heroStats" >
-  <div class="hero-info">
-    <div>Current Level: {{ heroData.level }}</div>
-    <div>Current DP (Development Points): {{ heroData.dpPoints }}</div>
-  </div>
-  <table class="table-hover">
+<div class="attributes-panel" *ngIf="heroData && heroStats">
+  <table class="table table-hover transparent-table transparent-table-hover">
     <thead>
       <tr>
-        <th class="attribute-name">Attribute Name</th>
-        <th class="attribute-value">Current Value</th>
-        <th class="increase-cost">Upgrade Cost</th>
-        <th class="actions">Change</th>
+        <td class="attribute-name text-start">Current DP (Development Points)</td>
+        <td colspan="3" class="text-center attribute-value">
+          {{ heroData.dpPoints }}
+        </td>
+      </tr>
+      <tr>
+        <th class="attribute-name" id="header">Attribute Name</th>
+        <th class="attribute-value" id="header">Current Value</th>
+        <th class="increase-cost" id="header">Upgrade Cost</th>
+        <th class="actions" id="header">Change</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let attribute of attributesToDisplay">
-        <td class="d-flex flex-row gap-1">
-          <span>{{ attributesMetadata[attribute].displayName }}</span
+        <td class="align-middle">
+          <span>{{ attributesMetadata[attribute].displayName }} </span
           ><span
             class="bi bi-question-diamond"
             style="cursor: pointer"
@@ -26,8 +28,8 @@
             triggers="click"
           ></span>
         </td>
-        <td class="attribute-value">{{ getAttributeValue(attribute) }}</td>
-        <td class="increase-cost">
+        <td class="attribute-value align-middle">{{ getAttributeValue(attribute) }}</td>
+        <td class="increase-cost align-middle">
           {{ calculateCostForAttribute(getAttributeValue(attribute)) }}
         </td>
         <td class="actions d-flex flex-row justify-content-between">
@@ -38,11 +40,7 @@
     </tbody>
   </table>
   <div class="d-flex w-100 justify-content-between">
-    <button class="btn" (click)="resetChanges()">
-      Reset changes
-    </button>
-    <button class="btn" (click)="updateAttributes()">
-      Confirm changes
-    </button>
+    <button class="btn" (click)="resetChanges()">Reset changes</button>
+    <button class="btn" (click)="updateAttributes()">Confirm changes</button>
   </div>
 </div>

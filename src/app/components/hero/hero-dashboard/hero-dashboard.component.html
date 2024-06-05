@@ -1,3 +1,5 @@
+<h4>Dashboard</h4>
+
 <div
   class="dashboard"
   *ngIf="
@@ -10,40 +12,81 @@
   "
 >
   <header class="dashboard-header">
-    <h3>{{ heroData.heroName }}, Level: {{ heroData.level }}</h3>
+    <h5>{{ heroData.heroName }}, Level: {{ heroData.level }}</h5>
   </header>
 
   <div class="dashboard-content">
     <section class="hero-basic-info">
-        <div class="info-item">
-          <span style="font-weight: bold;">Origin:</span> {{ getOriginDisplayName(heroData.originId) }}
-        </div>
-        <div class="info-item"><span style="font-weight: bold;">Hierarchy Rank:</span> {{ ranksMetadata[heroData.rankName].displayName }}</div>
-        <div class="info-item"><span style="font-weight: bold;">Experience:</span> {{ heroData.xpPoints }}</div>
-        <div class="info-item"><span style="font-weight: bold;">Development Points:</span> {{ heroData.dpPoints }}</div>
-        <div class="info-item">
-            <span style="font-weight: bold;">Alliance:</span> {{ heroData.allianceID === 0 ? "-" : heroData.allianceID }}
-        </div>
-        <div class="info-item"><span style="font-weight: bold;">Damage:</span> {{ heroData.minDamage }} - {{ heroData.maxDamage }}</div>
-        <div class="info-item"><span style="font-weight: bold;">Defense:</span> {{ heroData.defense }}</div>
-        <div class="info-item"><span style="font-weight: bold;">Hit Points:</span> {{ heroData.hp }}</div>
-        <div class="info-item"><span style="font-weight: bold;">Luck:</span> {{ heroData.luck }}</div>
-    </section>
-    <section class="hero-basic-info" *ngIf="originImageUrl">
-        <img [src]="originImageUrl" [alt]="getOriginDisplayName(heroData.originId) + 'warrior'" class="origin-image">
-      </section>
-  </div>
-
-  <header class="dashboard-header">
-    <h3>Attributes</h3>
-  </header>
-  <div class="dashboard-content">
-    <section class="hero-stats">
-      <div class="stats-grid">
-        <div *ngFor="let key of attributesKeys" class="stats-item">
-          <span style="font-weight: bold;">{{ attributesMetadata[key].displayName }}:</span> {{ displayHeroStats(key) }}
-        </div>
+      <div class="info-item">
+        <span style="font-weight: bold">Origin:</span>
+        {{ getOriginDisplayName(heroData.originId) }}
+      </div>
+      <div class="info-item">
+        <span style="font-weight: bold">Hierarchy Rank:</span>
+        {{ ranksMetadata[heroData.rankName].displayName }}
+      </div>
+      <div class="info-item">
+        <span style="font-weight: bold">Experience:</span>
+        {{ heroData.xpPoints }}
+      </div>
+      <div class="info-item">
+        <span style="font-weight: bold">Development Points:</span>
+        {{ heroData.dpPoints }}
+      </div>
+      <div class="info-item">
+        <span style="font-weight: bold">Alliance:</span>
+        {{ heroData.allianceID === 0 ? "-" : heroData.allianceID }}
       </div>
     </section>
+    <section class="hero-basic-info" *ngIf="originImageUrl">
+      <img
+        [src]="originImageUrl"
+        [alt]="getOriginDisplayName(heroData.originId) + 'warrior'"
+        class="origin-image"
+      />
+    </section>
+  </div>
+
+  <div class="d-flex flex-row w-100 justify-content-between gap-3">
+    <div class="dashboard w-100" style="padding: 0;">
+      <header class="dashboard-header">
+        <h5>Battle skills</h5>
+      </header>
+      <div class="dashboard-content align-items-start">
+        <section class="hero-basic-info">
+          <div class="info-item">
+            <span style="font-weight: bold">Damage:</span>
+            {{ heroData.minDamage }} - {{ heroData.maxDamage }}
+          </div>
+          <div class="info-item">
+            <span style="font-weight: bold">Defense:</span>
+            {{ heroData.defense }}
+          </div>
+          <div class="info-item">
+            <span style="font-weight: bold">Hit Points:</span> {{ heroData.hp }}
+          </div>
+          <div class="info-item">
+            <span style="font-weight: bold">Luck:</span> {{ heroData.luck }}
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="dashboard w-100" style="padding: 0;">
+      <header class="dashboard-header">
+        <h5>Attributes</h5>
+      </header>
+      <div class="dashboard-content">
+        <section class="hero-stats">
+          <div class="stats-grid">
+            <div *ngFor="let key of attributesKeys" class="stats-item">
+              <span style="font-weight: bold"
+                >{{ attributesMetadata[key].displayName }}:</span
+              >
+              {{ displayHeroStats(key) }}
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
   </div>
 </div>

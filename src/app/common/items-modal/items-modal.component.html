@@ -11,6 +11,13 @@
         </div>
       </div>
 
+      <div class="d-flex flex-row justify-content-between w-100">
+        <div>ID:</div>
+        <div class="w-50">
+          <input class="form-control" type="number" formControlName="id" />
+        </div>
+      </div>
+
       <div
         class="d-flex flex-row justify-content-between w-100"
         *ngIf="
@@ -62,24 +69,24 @@
           </div>
           <div class="d-flex flex-row justify-content-between">
             <div *ngIf="canAppearOnOptions.value.includes('Weapon')">
-              <label>Weapon Types:</label>
-              <select [formControl]="weaponsArray" multiple class="form-select form-select-sm">
+              <div>Weapon Types:</div>
+              <select [formControl]="weaponsArray" multiple class="form-select form-select">
                 <option *ngFor="let type of weaponsTypes" [value]="type">
                   {{ type }}
                 </option>
               </select>
             </div>
             <div *ngIf="canAppearOnOptions.value.includes('Armor')">
-              <label>Armor Types:</label>
-              <select [formControl]="armorArray" multiple class="form-select form-select-sm">
+              <div>Armor Types:</div>
+              <select [formControl]="armorArray" multiple class="form-select form-select">
                 <option *ngFor="let type of armorTypes" [value]="type">
                   {{ type }}
                 </option>
               </select>
             </div>
             <div *ngIf="canAppearOnOptions.value.includes('Jewelry')">
-              <label>Jewelry Types:</label>
-              <select [formControl]="jewelryArray" multiple class="form-select form-select-sm">
+              <div>Jewelry Types:</div>
+              <select [formControl]="jewelryArray" multiple class="form-select form-select">
                 <option *ngFor="let type of jewelryTypes" [value]="type">
                   {{ type }}
                 </option>
@@ -126,6 +133,7 @@
             <select
               formControlName="type"
               (change)="onRequirementTypeChange(i)"
+              class="form-select form-select-sm"
             >
               <option value="building">Building</option>
               <option value="heroStat">Hero Stat</option>
@@ -135,7 +143,7 @@
               *ngIf="reqGroup.get('buildingId')"
               class="d-flex flex-row gap-2"
             >
-              <select formControlName="buildingId">
+              <select formControlName="buildingId" class="form-select form-select-sm">
                 <option *ngFor="let key of buildingsKeys" [value]="key">
                   {{ buildingsMetadata[key].displayName || key }}
                 </option>
@@ -146,8 +154,8 @@
                 placeholder="Level"
               />
             </div>
-            <div *ngIf="reqGroup.get('stat')" class="d-flex flex-row gap-2">
-              <select formControlName="stat">
+            <div *ngIf="reqGroup.get('stat')" class="d-flex flex-row gap-2 align-items-center m-0">
+              <select formControlName="stat" class="form-select form-select-sm">
                 <option *ngFor="let key of attributesKeys" [value]="key">
                   {{ attributesMetadata[key].displayName || key }}
                 </option>
@@ -222,7 +230,7 @@
             [formGroupName]="i"
             class="d-flex flex-row gap-2 align-items-center"
           >
-            <select formControlName="type">
+            <select formControlName="type" class="form-select form-select-sm">
               <option *ngFor="let key of bonusesKeys" [value]="key">
                 {{ bonusesMetadata[key].displayName || key }}
               </option>

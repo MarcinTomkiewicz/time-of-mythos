@@ -9,6 +9,7 @@ import { provideFirestore } from '@angular/fire/firestore';
 import { getFirestore } from 'firebase/firestore';
 import { AuthService } from './services/auth-service';
 import { getStorage, provideStorage } from '@angular/fire/storage';
+import { CapitalizePipe } from './pipes/capitalize-pipe';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideRouter(routes),

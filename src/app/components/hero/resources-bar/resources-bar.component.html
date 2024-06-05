@@ -1,34 +1,56 @@
-<div class="d-flex flex-column gap-2 justify-content-center" *ngIf="heroResources">
-  <div
-    class="d-flex justify-content-between align-items-center w-100 flex-row gap-2"
+<table class="w-100" *ngIf="heroResources">
+  <thead>
+    <tr>
+      <th>Drachma</th>
+      <th>Materials</th>
+      <th>Workforce</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ heroResources["drachma"] }}</td>
+      <td>{{ heroResources["materials"] }}</td>
+      <td>{{ heroResources["workforce"] }}</td>
+    </tr>
+    <tr>
+      <td>{{ resourcesGrowth["drachma"] }}/h</td>
+      <td>{{ resourcesGrowth["materials"] }}/h</td>
+      <td>{{ resourcesGrowth["workforce"] }}/h</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- <table *ngIf="heroResources">
+  <tr
+    
   >
-    <div>
+    <td>
       <span style="font-weight: bold">Drachma:</span>
       {{ heroResources["drachma"] }}
-    </div>
-    <div>
+    </td>
+    <td>
       <span style="font-weight: bold">Materials:</span>
       {{ heroResources["materials"] }}
-    </div>
-    <div>
+    </td>
+    <td>
       <span style="font-weight: bold">Workforce:</span>
       {{ heroResources["workforce"] }}
-    </div>
-  </div>
-  <div
-    class="d-flex justify-content-between align-items-center w-100 flex-row gap-2"
+    </td>
+  </tr>
+  <tr
+    
   >
-    <div>
+    <td>
       <span style="font-weight: bold">Drachma growth:</span>
       {{ resourcesGrowth["drachma"] }}/h
-    </div>
-    <div>
+    </td>
+    <td>
       <span style="font-weight: bold">Materials growth:</span>
       {{ resourcesGrowth["materials"] }}/h
-    </div>
-    <div>
+    </td>
+    <td>
       <span style="font-weight: bold">Workforce growth:</span>
       {{ resourcesGrowth["workforce"] }}/h
-    </div>
-  </div>
-</div>
+    </td>
+  </tr>
+</table> -->

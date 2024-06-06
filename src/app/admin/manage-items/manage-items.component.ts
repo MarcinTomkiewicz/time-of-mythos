@@ -13,6 +13,7 @@ import {
 } from '../../interfaces/definitions/i-item';
 import { CapitalizePipe } from '../../pipes/capitalize-pipe';
 import { CommonService } from '../../services/common-service';
+import { Observable, forkJoin, map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-manage-items',
@@ -64,12 +65,34 @@ export class ManageItemsComponent implements OnInit {
   showItems(itemType: string) {
     this.firestoreService
       .getDefinitions(`definitions/${itemType}`, 'id')
+      .pipe(
+        switchMap((items: { [key: string]: IItem | IArmor | IPrefix | ISuffix }) => {
+          const itemArray = Object.values(items);
+          const observables = itemArray.map(item => this.fetchItemIconUrl(item));
+          return forkJoin(observables);
+        })
+      )
       .subscribe(
-        (items: { [key: string]: IItem | IArmor | IPrefix | ISuffix }) => {
-          this.items = Object.values(items);
+        (items: (IItem | IArmor | IPrefix | ISuffix)[]) => {
+          this.items = items;
           this.selectedItem = itemType;
         }
       );
+  }
+
+  fetchItemIconUrl(item: IItem | IArmor | IPrefix | ISuffix): Observable<IItem | IArmor | IPrefix | ISuffix> {
+    if (!item.icon) {
+      return new Observable(observer => {
+        observer.next(item);
+        observer.complete();
+      });
+    }
+    return this.firestoreService.getDownloadUrl(item.icon).pipe(
+      map(url => {
+        item.icon = url;
+        return item;
+      })
+    );
   }
 
   sortItems(column: string): void {

@@ -9,20 +9,20 @@ export class CommonService implements OnInit {
 
   convertTimestampToDate(timestamp: Timestamp | undefined): string {
     if (timestamp) {
-    const date = timestamp.toDate();
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const day = ('0' + date.getDate()).slice(-2);
-    const hours = ('0' + date.getHours()).slice(-2);
-    const minutes = ('0' + date.getMinutes()).slice(-2);
-    const seconds = ('0' + date.getSeconds()).slice(-2);
-    return `${day}-${month}-${year}, ${hours}:${minutes}:${seconds}`;
+      const date = timestamp.toDate();
+      const year = date.getFullYear();
+      const month = ('0' + (date.getMonth() + 1)).slice(-2);
+      const day = ('0' + date.getDate()).slice(-2);
+      const hours = ('0' + date.getHours()).slice(-2);
+      const minutes = ('0' + date.getMinutes()).slice(-2);
+      const seconds = ('0' + date.getSeconds()).slice(-2);
+      return `${day}-${month}-${year}, ${hours}:${minutes}:${seconds}`;
     }
-    return 'N/A'
+    return 'N/A';
   }
 
   convertDateToReadableDate(date: Date | undefined): string {
-    if (date) {        
+    if (date) {
       const year = date.getFullYear();
       const month = ('0' + (date.getMonth() + 1)).slice(-2);
       const day = ('0' + date.getDate()).slice(-2);
@@ -41,6 +41,7 @@ export class CommonService implements OnInit {
   }
 
   capitalizeWords(input: string): string {
-    return input.replace(/\b\w/g, (match) => match.toUpperCase());
+    let modifiedInput = input.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return modifiedInput.replace(/\b\w/g, (match) => match.toUpperCase());
   }
 }

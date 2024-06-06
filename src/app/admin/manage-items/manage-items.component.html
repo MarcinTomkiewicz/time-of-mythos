@@ -48,6 +48,9 @@
   >
     <thead>
       <tr>
+        <th *ngIf="selectedItem !== 'prefix' && selectedItem !== 'suffix'">
+          Icon
+        </th>
         <th
           tabindex="0"
           as
@@ -57,7 +60,11 @@
           style="cursor: pointer"
         >
           {{ selectedItem | capitalize }} Name
-          <span><i [class]="sortAscending ? 'bi bi-sort-down-alt' : 'bi bi-sort-up'"></i></span>
+          <span
+            ><i
+              [class]="sortAscending ? 'bi bi-sort-down-alt' : 'bi bi-sort-up'"
+            ></i
+          ></span>
         </th>
         <th
           tabindex="0"
@@ -69,7 +76,11 @@
           style="cursor: pointer"
         >
           {{ selectedItem | capitalize }} Subtype
-          <span><i [class]="sortAscending ? 'bi bi-sort-down-alt' : 'bi bi-sort-up'"></i></span>
+          <span
+            ><i
+              [class]="sortAscending ? 'bi bi-sort-down-alt' : 'bi bi-sort-up'"
+            ></i
+          ></span>
         </th>
         <th
           tabindex="0"
@@ -79,7 +90,12 @@
           (keydown)="onHeaderKeydown($event, 'id')"
           style="cursor: pointer"
         >
-          ID <span><i [class]="sortAscending ? 'bi bi-sort-down-alt' : 'bi bi-sort-up'"></i></span>
+          ID
+          <span
+            ><i
+              [class]="sortAscending ? 'bi bi-sort-down-alt' : 'bi bi-sort-up'"
+            ></i
+          ></span>
         </th>
         <th
           tabindex="0"
@@ -89,13 +105,25 @@
           (keydown)="onHeaderKeydown($event, 'value')"
           style="cursor: pointer"
         >
-          Value <span><i [class]="sortAscending ? 'bi bi-sort-down-alt' : 'bi bi-sort-up'"></i></span>
+          Value
+          <span
+            ><i
+              [class]="sortAscending ? 'bi bi-sort-down-alt' : 'bi bi-sort-up'"
+            ></i
+          ></span>
         </th>
         <th>Edit</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let item of items">
+        <td *ngIf="selectedItem !== 'prefix' && selectedItem !== 'suffix'">
+          <img
+            [src]="item.icon"
+            [alt]="commonService.capitalizeWords(item.name)"
+            style="width: 100px; height: auto"
+          />
+        </td>
         <td>{{ commonService.capitalizeWords(item.name) }}</td>
         <td *ngIf="selectedItem !== 'prefix' && selectedItem !== 'suffix'">
           {{ item.type }}

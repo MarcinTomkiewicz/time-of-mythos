@@ -27,7 +27,7 @@ export class ResourcesBarComponent {
   heroBuildingsKeys: string[] = [];
   resourcesMetadata!: { [key: string]: IMetadata };
   resourceKeys: string[] = [];
-  heroResources!: { [key: string]: number}
+  heroResources!: { [key: string]: number };
   resourcesGrowth: { [key: string]: number } = {};
 
   constructor(
@@ -54,7 +54,9 @@ export class ResourcesBarComponent {
           heroBuildings: this.firestoreService.getHeroData<{
             [key: string]: number;
           }>(this.userUid, 'heroBuildings'),
-          heroResources: this.firestoreService.getHeroData<{[key: string]: number;}>(this.userUid, 'heroResources')
+          heroResources: this.firestoreService.getHeroData<{
+            [key: string]: number;
+          }>(this.userUid, 'heroResources'),
         }).subscribe({
           next: (data) => {
             this.resourcesMetadata = data.resourcesMetadata;
@@ -77,18 +79,16 @@ export class ResourcesBarComponent {
                 .subscribe((icon) => {
                   this.buildingIcons[key] = icon;
                 });
+            });
 
-              });
-              
-              
-              this.calculateResourcesGrowth();
-            },
-            error: (error) => {
-              console.error('Error loading data:', error);
-            },
-          });
+            this.calculateResourcesGrowth();
+          },
+          error: (error) => {
+            console.error('Error loading data:', error);
+          },
+        });
       }
-    });   
+    });
   }
 
   calculateResourcesGrowth(): void {
@@ -97,11 +97,24 @@ export class ResourcesBarComponent {
     const lumberMillLevel = this.heroBuildings['lumberMill'] || 0;
     const farmLevel = this.heroBuildings['farm'] || 0;
 
-    this.resourcesGrowth['drachma'] = this.formulasService.calculateBonusFormula(this.buildingsDefinition['agora'].bonusFormula, this.buildingsDefinition['agora'].bonuses, agoraLevel-1)[0].value;
-    console.log(this.buildingsDefinition['agora'].bonusFormula, this.buildingsDefinition['agora'].bonuses, agoraLevel, this.resourcesGrowth['drachma']);
-    
-    this.resourcesGrowth['materials'] = this.formulasService.calculateBonusFormula(this.buildingsDefinition['lumberMill'].bonusFormula, this.buildingsDefinition['lumberMill'].bonuses, lumberMillLevel-1)[0].value;
-    this.resourcesGrowth['workforce'] = this.formulasService.calculateBonusFormula(this.buildingsDefinition['farm'].bonusFormula, this.buildingsDefinition['farm'].bonuses, farmLevel-1)[0].value;
+    this.resourcesGrowth['drachma'] =
+      this.formulasService.calculateBonusFormula(
+        this.buildingsDefinition['agora'].bonusFormula,
+        this.buildingsDefinition['agora'].bonuses,
+        agoraLevel - 1
+      )[0].value;
+    this.resourcesGrowth['materials'] =
+      this.formulasService.calculateBonusFormula(
+        this.buildingsDefinition['lumberMill'].bonusFormula,
+        this.buildingsDefinition['lumberMill'].bonuses,
+        lumberMillLevel - 1
+      )[0].value;
+    this.resourcesGrowth['workforce'] =
+      this.formulasService.calculateBonusFormula(
+        this.buildingsDefinition['farm'].bonusFormula,
+        this.buildingsDefinition['farm'].bonuses,
+        farmLevel - 1
+      )[0].value;
   }
 
   log(data: any) {

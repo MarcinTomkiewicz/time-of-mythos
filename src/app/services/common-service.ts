@@ -33,4 +33,14 @@ export class CommonService implements OnInit {
     }
     return 'N/A';
   }
+
+  toCamelCase(input: string): string {
+    return input
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase());
+  }
+
+  capitalizeWords(input: string): string {
+    return input.replace(/\b\w/g, (match) => match.toUpperCase());
+  }
 }

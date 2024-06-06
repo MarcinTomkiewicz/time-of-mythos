@@ -15,7 +15,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { IRequirement } from '../../interfaces/definitions/i-requirements';
 import { FirestoreService } from '../../services/firestore-service';
 import { FormulasService } from '../../services/formulas-service';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin, map } from 'rxjs';
 import { IMetadata } from '../../interfaces/metadata/i-metadata';
 import { IBonus } from '../../interfaces/definitions/i-bonus';
 
@@ -116,59 +116,63 @@ export class ItemsModalComponent {
   }
 
   initializeForm() {
-    this.itemForm = this.fb.group({
-      name: ['', Validators.required],
-      id: [0, Validators.required],
-      type: [''],
-      requirements: this.fb.array([]),
-      bonuses: this.fb.array([]),
-      value: [0, Validators.required],
-    });
+    this.firestoreService
+      .assignNextID(`definitions/${this.itemType}`)
+      .subscribe((nextID) => {
+        this.itemForm = this.fb.group({
+          name: ['', Validators.required],
+          id: [nextID, Validators.required],
+          type: [''],
+          requirements: this.fb.array([]),
+          bonuses: this.fb.array([]),
+          value: [0, Validators.required],
+        });
 
-    this.itemForm.get('type')?.valueChanges.subscribe((value) => {
-      this.onTypeChange(value);
-    });
+        this.itemForm.get('type')?.valueChanges.subscribe((value) => {
+          this.onTypeChange(value);
+        });
 
-    if (this.itemType === 'weapon') {
-      this.itemForm.addControl('minDamage', new FormControl(0));
-      this.itemForm.addControl('maxDamage', new FormControl(0));
-      this.itemForm.addControl('icon', new FormControl(null));
-    }
+        if (this.itemType === 'weapon') {
+          this.itemForm.addControl('minDamage', new FormControl(0));
+          this.itemForm.addControl('maxDamage', new FormControl(0));
+          this.itemForm.addControl('icon', new FormControl(null));
+        }
 
-    if (this.itemType === 'armor') {
-      this.itemForm.addControl('defense', new FormControl(0));
-      this.itemForm.addControl('icon', new FormControl(null));
-    }
+        if (this.itemType === 'armor') {
+          this.itemForm.addControl('defense', new FormControl(0));
+          this.itemForm.addControl('icon', new FormControl(null));
+        }
 
-    if (this.itemType === 'jewelry') {
-      this.itemForm.addControl('icon', new FormControl(null));
-    }
+        if (this.itemType === 'jewelry') {
+          this.itemForm.addControl('icon', new FormControl(null));
+        }
 
-    if (this.itemType === 'prefix' || this.itemType === 'suffix') {
-      this.itemForm.addControl('isSetItem', new FormControl(false));
-      this.itemForm.addControl('setName', new FormControl(''));
-      this.itemForm.addControl(
-        'canAppearOn',
-        this.fb.group({
-          weapon: [],
-          armor: [],
-          jewelry: [],
-        })
-      );
-    } else {
-      this.itemForm.removeControl('canAppearOn');
-      this.itemForm.removeControl('isSetItem');
-      this.itemForm.removeControl('setName');
-    }
+        if (this.itemType === 'prefix' || this.itemType === 'suffix') {
+          this.itemForm.addControl('isSetItem', new FormControl(false));
+          this.itemForm.addControl('setName', new FormControl(''));
+          this.itemForm.addControl(
+            'canAppearOn',
+            this.fb.group({
+              weapon: [],
+              armor: [],
+              jewelry: [],
+            })
+          );
+        } else {
+          this.itemForm.removeControl('canAppearOn');
+          this.itemForm.removeControl('isSetItem');
+          this.itemForm.removeControl('setName');
+        }
 
-    if (this.itemType === 'prefix' || this.itemType === 'suffix') {
-      this.canAppearOnOptions = this.fb.control([]);
-      this.itemForm.addControl('options', this.canAppearOnOptions);
+        if (this.itemType === 'prefix' || this.itemType === 'suffix') {
+          this.canAppearOnOptions = this.fb.control([]);
+          this.itemForm.addControl('options', this.canAppearOnOptions);
 
-      this.canAppearOnOptions.valueChanges.subscribe((value) => {
-        this.updateCanAppearOn(value);
+          this.canAppearOnOptions.valueChanges.subscribe((value) => {
+            this.updateCanAppearOn(value);
+          });
+        }
       });
-    }
   }
 
   onTypeChange(type: string) {
@@ -430,18 +434,20 @@ export class ItemsModalComponent {
   onSubmit(): void {
     if (this.itemForm.valid) {
       if (this.itemType !== 'prefix' && this.itemType !== 'suffix') {
-      this.firestoreService
-        .uploadFile(this.selectedFile, this.itemType)
-        .subscribe({
-          next: (url) => {
-            this.itemForm.patchValue({
-              icon: `items/${this.itemType}/${this.selectedFile.name}`,
-            });
-          },
-          error: (error) => {
-            console.error('Error uploading file:', error);
-          },
-        });
+        this.firestoreService
+          .uploadFile(this.selectedFile, this.itemType)
+          .subscribe({
+            next: (url) => {
+              this.itemForm.patchValue({
+                icon: `items/${this.itemType}/${this.selectedFile.name}`,
+              });
+            },
+            error: (error) => {
+              console.error('Error uploading file:', error);
+            },
+          });
+          console.log(this.itemForm.value);
+          
         this.firestoreService
           .createItem(`definitions/${this.itemType}`, {
             ...this.itemForm.value,
@@ -458,7 +464,7 @@ export class ItemsModalComponent {
           });
       } else {
         console.log(this.itemForm.value);
-        
+
         this.firestoreService
           .createItem(`definitions/${this.itemType}`, this.itemForm.value)
           .subscribe({

@@ -1,15 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable, catchError, from, map, of } from 'rxjs';
 import { IMetadata } from '../interfaces/metadata/i-metadata';
-import { Firestore, getDoc, doc, setDoc, addDoc, collection, updateDoc } from '@angular/fire/firestore';
-import { getDownloadURL, getStorage, ref, uploadBytes } from '@angular/fire/storage';
-import { DataProcessingService } from './data-processing-service';
 import {
-  DocumentData,
-  PartialWithFieldValue,
-} from 'firebase/firestore';
+  Firestore,
+  getDoc,
+  doc,
+  setDoc,
+  updateDoc,
+} from '@angular/fire/firestore';
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+} from '@angular/fire/storage';
+import { DataProcessingService } from './data-processing-service';
+import { DocumentData, PartialWithFieldValue } from 'firebase/firestore';
 import { IBuilding } from '../interfaces/definitions/i-building';
-import { IArmor, IItem, IPrefix, ISuffix, IWeapon } from '../interfaces/definitions/i-item';
+import {
+  IArmor,
+  IItem,
+  IPrefix,
+  ISuffix,
+  IWeapon,
+} from '../interfaces/definitions/i-item';
+import { CommonService } from './common-service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +32,8 @@ import { IArmor, IItem, IPrefix, ISuffix, IWeapon } from '../interfaces/definiti
 export class FirestoreService {
   constructor(
     private firestore: Firestore,
-    private dataProcessingService: DataProcessingService
+    private dataProcessingService: DataProcessingService,
+    private commonService: CommonService
   ) {}
 
   getHeroData<T>(userId: string, collection: string): Observable<T> {
@@ -28,7 +44,7 @@ export class FirestoreService {
         .then((snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data() as T;
-            observer.next(data);           
+            observer.next(data);
             observer.complete();
           }
         })
@@ -70,6 +86,7 @@ export class FirestoreService {
             const definitionsData = snapshot.data() as {
               [key: string]: any;
             };
+
             const processedData = this.dataProcessingService.processDefinitions(
               definitionsData,
               idKey
@@ -115,6 +132,28 @@ export class FirestoreService {
     return from(getDownloadURL(storageRef));
   }
 
+  assignNextID(collectionPath: string): Observable<number> {
+    const docRef = doc(this.firestore, collectionPath);
+    return from(getDoc(docRef)).pipe(
+      map((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          const ids = Object.values(data)
+            .map((item: any) => item.id)
+            .filter((id: number) => !isNaN(id));
+          const maxID = ids.length ? Math.max(...ids) : 0;
+          return maxID + 1;
+        } else {
+          return 1; // jeśli dokument nie istnieje, zacznij od 1
+        }
+      }),
+      catchError((error) => {
+        console.error('Error getting document:', error);
+        return of(1); // w przypadku błędu, zacznij od 1
+      })
+    );
+  }
+
   updateBuilding(
     buildingName: string,
     buildingData: IBuilding
@@ -126,10 +165,14 @@ export class FirestoreService {
     return from(setDoc(buildingRef, updateData, { merge: true }));
   }
 
-  createItem(documentPath: string, item: IItem | IWeapon | IArmor | IPrefix | ISuffix): Observable<void> {
+  createItem(
+    documentPath: string,
+    item: IItem | IWeapon | IArmor | IPrefix | ISuffix
+  ): Observable<void> {
     return new Observable<void>((observer) => {
       const docRef = doc(this.firestore, documentPath);
-      updateDoc(docRef, { [item.name.toLowerCase()]: item })
+      const itemKey = this.commonService.toCamelCase(item.name);
+      updateDoc(docRef, { [itemKey]: item })
         .then(() => {
           observer.next();
           observer.complete();
@@ -140,7 +183,11 @@ export class FirestoreService {
     });
   }
 
-  updateItem(collectionPath: string, itemId: number, item: Partial<IItem | IWeapon | IArmor | IPrefix | ISuffix>): Observable<void> {
+  updateItem(
+    collectionPath: string,
+    itemId: number,
+    item: Partial<IItem | IWeapon | IArmor | IPrefix | ISuffix>
+  ): Observable<void> {
     return new Observable<void>((observer) => {
       const docRef = doc(this.firestore, `${collectionPath}/${itemId}`);
       updateDoc(docRef, item)

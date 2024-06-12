@@ -1,64 +1,207 @@
-<div class="modal-header">
-  <h4 class="modal-title text-uppercase">Create {{ mode }}es</h4>
-</div>
-<div class="modal-body">
-  <form [formGroup]="prefixSuffixForm">
-    <table class="table table-bordered table-striped table-hover transparent-table transparent-table-hover text-center align-middle w-100">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th *ngIf="mode === 'prefix'">Set</th>
-          <th *ngIf="mode === 'prefix'">Set Name</th>
-          <th>Requirements</th>
-          <th>Bonuses</th>
-          <th>Value</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody formArrayName="items">
-        <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
-          <td>
-            <input class="form-control form-control-sm" formControlName="name" />
-          </td>
-          <td *ngIf="mode === 'prefix'">
-            <input class="form-check-input" type="checkbox" formControlName="isPartOfSet" />
-          </td>
-          <td *ngIf="mode === 'prefix'">
-            <input class="form-control form-control-sm" formControlName="setName" *ngIf="item.get('isPartOfSet')?.value" />
-          </td>
-          <td>
-            <input class="form-control form-control-sm" formControlName="requirements" placeholder="Enter requirements as JSON" />
-          </td>
-          <td formArrayName="bonuses">
-            <div *ngFor="let bonusGroup of getBonuses(item).controls; let j = index" [formGroupName]="j">
-              <div class="d-flex flex-row gap-1 justify-content-start">
-                <select formControlName="type" class="form-select form-select-sm" (change)="onBonusTypeChange(i, j)">
-                  <option *ngFor="let key of bonusesKeys" [value]="key">{{ bonusesMetadata[key].displayName || key }}</option>
-                </select>
-
-                <select *ngIf="bonusGroup.get('type')?.value === 'statChange'" class="form-select form-select-sm" formControlName="attribute">
-                  <option *ngFor="let key of attributesKeys" [value]="key">{{ attributesMetadata[key].displayName || key }}</option>
-                </select>
-
-                <input class="form-control form-control-sm" type="number" formControlName="value" placeholder="Value" />
-                <button type="button" class="btn" (click)="removeBonus(i, j)">-</button>
+<div class="modal-fullscreen">
+  <div class="modal-header">
+    <h4 class="modal-title text-uppercase">Create {{ mode }}es</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="prefixSuffixForm">
+      <table
+        class="table table-bordered table-striped table-hover transparent-table transparent-table-hover text-center align-middle w-100"
+      >
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th *ngIf="mode === 'prefix'">Set</th>
+            <th *ngIf="mode === 'prefix'">Set Name</th>
+            <th>Requirements</th>
+            <th>Bonuses</th>
+            <th>Value</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="items">
+          <tr
+            *ngFor="let item of items.controls; let i = index"
+            [formGroupName]="i"
+          >
+            <td>
+              <input
+                class="form-control form-control-sm"
+                formControlName="name"
+              />
+            </td>
+            <td *ngIf="mode === 'prefix'">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                formControlName="isPartOfSet"
+              />
+            </td>
+            <td *ngIf="mode === 'prefix'">
+              <input
+                class="form-control form-control-sm"
+                formControlName="setName"
+                *ngIf="item.get('isPartOfSet')?.value"
+              />
+            </td>
+            <td formArrayName="requirements">
+              <div
+                *ngFor="
+                  let reqGroup of getRequirements(item).controls;
+                  let j = index
+                "
+                [formGroupName]="j"
+              >
+                <div class="d-flex flex-row gap-1 justify-content-start">
+                  <select
+                    formControlName="type"
+                    (change)="onRequirementTypeChange(i, j)"
+                    class="form-select form-select-sm"
+                  >
+                    <option value="building">Building</option>
+                    <option value="heroStat">Hero Stat</option>
+                    <option value="heroLevel">Hero Level</option>
+                  </select>
+                  <div
+                    *ngIf="reqGroup.get('buildingId')"
+                    class="d-flex flex-row gap-2 align-items-center m-0"
+                  >
+                    <select
+                      formControlName="buildingId"
+                      class="form-select form-select-sm"
+                    >
+                      <option *ngFor="let key of buildingsKeys" [value]="key">
+                        {{ buildingsMetadata[key].displayName || key }}
+                      </option>
+                    </select>
+                    <input
+                      class="form-control form-control-sm"
+                      type="number"
+                      formControlName="level"
+                      placeholder="Level"
+                    />
+                  </div>
+                  <div
+                    *ngIf="reqGroup.get('stat')"
+                    class="d-flex flex-row gap-2 align-items-center m-0"
+                  >
+                    <select
+                      formControlName="stat"
+                      class="form-select form-select-sm"
+                    >
+                      <option *ngFor="let key of attributesKeys" [value]="key">
+                        {{ attributesMetadata[key].displayName || key }}
+                      </option>
+                    </select>
+                    <input
+                      class="form-control form-control-sm"
+                      type="number"
+                      formControlName="value"
+                      placeholder="Value"
+                    />
+                  </div>
+                  <div
+                    *ngIf="
+                      reqGroup.get('value') &&
+                      !reqGroup.get('stat') &&
+                      !reqGroup.get('buildingId')
+                    "
+                    class="d-flex flex-row gap-2 align-items-center m-0"
+                  >
+                    <input
+                      class="form-control form-control-sm"
+                      type="number"
+                      formControlName="value"
+                      placeholder="Minimum Hero Level"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    class="btn"
+                    (click)="removeRequirement(i, j)"
+                  >
+                    -
+                  </button>
+                </div>
               </div>
-            </div>
-            <button type="button" class="btn mt-2 align-self-start" (click)="addBonus(i)">+</button>
-          </td>
-          <td>
-            <input class="form-control form-control-sm" type="number" formControlName="value" />
-          </td>
-          <td>
-            <button type="button" class="btn" (click)="removeItem(i)">Remove</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <button type="button" class="btn mb-2" (click)="addNewItem()">Add Row</button>
-  </form>
-  <div class="modal-footer">
-    <button class="btn" type="submit" (click)="saveAll()">Save All</button>
-    <button type="button" class="btn" (click)="cancel()">Cancel</button>
+              <button
+                type="button"
+                class="btn mt-2"
+                (click)="addRequirement(i)"
+              >
+                +
+              </button>
+            </td>
+            <td formArrayName="bonuses">
+              <div
+                *ngFor="
+                  let bonusGroup of getBonuses(item).controls;
+                  let j = index
+                "
+                [formGroupName]="j"
+              >
+                <div class="d-flex flex-row gap-1 justify-content-start">
+                  <select
+                    formControlName="type"
+                    class="form-select form-select-sm"
+                    (change)="onBonusTypeChange(i, j)"
+                  >
+                    <option *ngFor="let key of bonusesKeys" [value]="key">
+                      {{ bonusesMetadata[key].displayName || key }}
+                    </option>
+                  </select>
+
+                  <select
+                    *ngIf="bonusGroup.get('type')?.value === 'statChange'"
+                    class="form-select form-select-sm"
+                    formControlName="attribute"
+                  >
+                    <option *ngFor="let key of attributesKeys" [value]="key">
+                      {{ attributesMetadata[key].displayName || key }}
+                    </option>
+                  </select>
+
+                  <input
+                    class="form-control form-control-sm"
+                    type="number"
+                    formControlName="value"
+                    placeholder="Value"
+                  />
+                  <button type="button" class="btn" (click)="removeBonus(i, j)">
+                    -
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn mt-2 align-self-start"
+                (click)="addBonus(i)"
+              >
+                +
+              </button>
+            </td>
+            <td>
+              <input
+                class="form-control form-control-sm"
+                type="number"
+                formControlName="value"
+              />
+            </td>
+            <td>
+              <button type="button" class="btn" (click)="removeItem(i)">
+                Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" class="btn mb-2" (click)="addNewItem()">
+        Add Row
+      </button>
+    </form>
+    <div class="modal-footer">
+      <button class="btn" type="submit" (click)="onSubmit()">Save All</button>
+      <button type="button" class="btn" (click)="cancel()">Cancel</button>
+    </div>
   </div>
 </div>

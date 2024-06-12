@@ -66,7 +66,8 @@ export class ManageItemsComponent implements OnInit {
 
   openBulkCreateAfixes(mode: string) {
     const modalRef = this.modalService.open(PrefixSuffixTableComponent, {
-      size: 'xl',
+      fullscreen: true,
+      modalDialogClass: 'modal-blue'
     });
     modalRef.componentInstance.mode = mode;
   }

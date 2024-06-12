@@ -8,3 +8,8 @@ h4 {
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;
   }
+
+  .modal-blue {
+    height: 100%;
+    background-color: rgba(127, 191, 255, 0.8);
+}

@@ -1,4 +1,4 @@
-import { Component, Input, NgIterable } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { IPrefix, ISuffix } from '../../interfaces/definitions/i-item';
 import { FirestoreService } from '../../services/firestore-service';
 import { NgFor, NgIf } from '@angular/common';
@@ -13,6 +13,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { IMetadata } from '../../interfaces/metadata/i-metadata';
 import { forkJoin } from 'rxjs';
 import { IBonus } from '../../interfaces/definitions/i-bonus';
+import { IRequirement } from '../../interfaces/definitions/i-requirements';
 
 @Component({
   selector: 'app-prefix-suffix-table',
@@ -84,22 +85,79 @@ export class PrefixSuffixTableComponent {
     return item.get('bonuses') as FormArray;
   }
 
+  getRequirements(item: any): FormArray {
+    return item.get('requirements') as FormArray;
+  }
+
   addNewItem() {
-    const itemForm = this.fb.group({
+    const items = this.fb.group({
       id: [Date.now()],
       name: [''],
       type: [this.mode],
       isPartOfSet: [false],
       setName: [''],
       bonuses: this.fb.array([]),
-      requirements: [[]],
+      requirements: this.fb.array([]),
       value: [0],
     });
-    this.items.push(itemForm);
+    this.items.push(items);
   }
 
   removeItem(index: number) {
     this.items.removeAt(index);
+  }
+
+  addRequirement(index: number): void {
+    const requirementForm = this.createBonusGroup({ type: this.bonusesKeys[0], value: 0 });
+    const requirementArray = this.items.at(index).get('requirements') as FormArray;
+    requirementArray.push(requirementForm);
+  }
+
+  removeRequirement(rowIndex: number, requirementIndex: number): void {
+    const requirementsArray = this.items.at(rowIndex).get('bonuses') as FormArray;
+    requirementsArray.removeAt(requirementIndex);
+  }
+  
+  onRequirementTypeChange(itemIndex: number, reqIndex: number): void {
+    const requirementsArray = this.items.at(itemIndex).get('requirements') as FormArray;
+    const reqGroup = requirementsArray.at(reqIndex) as FormGroup;
+    const typeControl = reqGroup.get('type');
+
+    if (typeControl?.value === 'building') {
+      reqGroup.addControl(
+        'buildingId',
+        this.fb.control('', Validators.required)
+      );
+      reqGroup.addControl('level', this.fb.control('', Validators.required));
+      reqGroup.removeControl('stat');
+      reqGroup.removeControl('value');
+    } else if (typeControl?.value === 'heroStat') {
+      reqGroup.addControl(
+        'stat',
+        this.fb.control(this.attributesKeys[0], Validators.required)
+      );
+      reqGroup.addControl('value', this.fb.control('', Validators.required));
+      reqGroup.removeControl('buildingId');
+      reqGroup.removeControl('level');
+    } else if (typeControl?.value === 'heroLevel') {
+      reqGroup.addControl('value', this.fb.control('', Validators.required));
+      reqGroup.removeControl('buildingId');
+      reqGroup.removeControl('level');
+      reqGroup.removeControl('stat');
+    }
+  }
+
+  createRequirementGroup(requirement: IBonus): FormGroup {
+    const group: FormGroup = this.fb.group({
+      type: [requirement.type, Validators.required],
+      value: [requirement.value || null, [Validators.required, Validators.min(1)]],
+    });
+
+    if (requirement.type === 'statChange') {
+      group.addControl('attribute', this.fb.control(requirement.attribute ?? '', Validators.required));
+    }
+
+    return group;
   }
 
   addBonus(index: number): void {
@@ -150,6 +208,12 @@ export class PrefixSuffixTableComponent {
     }
 
     return group;
+  }
+
+  onSubmit() {
+    const allItems = this.prefixSuffixForm.value.items;
+    console.log(allItems);
+    
   }
 
   saveAll() {

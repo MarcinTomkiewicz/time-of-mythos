@@ -101,10 +101,11 @@ export class FirestoreService {
     });
   }
 
-  getMetadata<T extends IMetadata>(
-    metadataName: string
-  ): Observable<{ [key: string]: T }> {
-    return new Observable<{ [key: string]: T }>((observer) => {
+  getMetadata(
+    metadataName: string,
+    sort = false,
+  ): Observable<{ [key: string]: IMetadata }> {
+    return new Observable<{ [key: string]: IMetadata }>((observer) => {
       const metadataDocumentRef = doc(
         this.firestore,
         `metadata/${metadataName}`
@@ -113,8 +114,13 @@ export class FirestoreService {
       getDoc(metadataDocumentRef)
         .then((snapshot) => {
           if (snapshot.exists()) {
-            const metadata = snapshot.data() as { [key: string]: T };
-            observer.next(metadata);
+            const metadata = snapshot.data() as { [key: string]: IMetadata };
+            if (sort) {
+            const sortedMetadata = this.dataProcessingService.processMetadata(metadata)
+            observer.next(sortedMetadata); }
+            else {
+              observer.next(metadata);
+            }
             observer.complete();
           } else {
             observer.error('No such document!');

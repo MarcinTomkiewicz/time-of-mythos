@@ -16,52 +16,49 @@
         </tr>
       </thead>
       <tbody formArrayName="items">
-        <tr
-          *ngFor="let item of items.controls; let i = index"
-          [formGroupName]="i"
-        >
-          <td><input class="form-control form-control-sm" formControlName="name" /></td>
+        <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
           <td>
-            <input class="form-check-input form-check-input"
-              type="checkbox"
-              formControlName="isPartOfSet"
-              *ngIf="item.get('type')?.value === 'prefix'"
-            />
+            <input class="form-control form-control-sm" formControlName="name" />
+          </td>
+          <td *ngIf="mode === 'prefix'">
+            <input class="form-check-input" type="checkbox" formControlName="isPartOfSet" />
+          </td>
+          <td *ngIf="mode === 'prefix'">
+            <input class="form-control form-control-sm" formControlName="setName" *ngIf="item.get('isPartOfSet')?.value" />
           </td>
           <td>
-            <input class="form-control form-control-sm"
-              formControlName="setName"
-              *ngIf="
-                item.get('type')?.value === 'prefix' &&
-                item.get('isPartOfSet')?.value
-              "
-            />
+            <input class="form-control form-control-sm" formControlName="requirements" placeholder="Enter requirements as JSON" />
+          </td>
+          <td formArrayName="bonuses">
+            <div *ngFor="let bonusGroup of getBonuses(item).controls; let j = index" [formGroupName]="j">
+              <div class="d-flex flex-row gap-1 justify-content-start">
+                <select formControlName="type" class="form-select form-select-sm" (change)="onBonusTypeChange(i, j)">
+                  <option *ngFor="let key of bonusesKeys" [value]="key">{{ bonusesMetadata[key].displayName || key }}</option>
+                </select>
+
+                <select *ngIf="bonusGroup.get('type')?.value === 'statChange'" class="form-select form-select-sm" formControlName="attribute">
+                  <option *ngFor="let key of attributesKeys" [value]="key">{{ attributesMetadata[key].displayName || key }}</option>
+                </select>
+
+                <input class="form-control form-control-sm" type="number" formControlName="value" placeholder="Value" />
+                <button type="button" class="btn" (click)="removeBonus(i, j)">-</button>
+              </div>
+            </div>
+            <button type="button" class="btn mt-2 align-self-start" (click)="addBonus(i)">+</button>
           </td>
           <td>
-            <input class="form-control form-control-sm"
-              formControlName="requirements"
-              placeholder="Enter requirements as JSON"
-            />
+            <input class="form-control form-control-sm" type="number" formControlName="value" />
           </td>
           <td>
-            <input class="form-control form-control-sm"
-              formControlName="bonuses"
-              placeholder="Enter bonuses as JSON"
-            />
-          </td>
-          <td><input class="form-control form-control-sm" type="number" formControlName="value" /></td>
-          <td>
-            <button type="button" class="btn" (click)="removeItem(i)">
-              Remove
-            </button>
+            <button type="button" class="btn" (click)="removeItem(i)">Remove</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <button type="button" class="btn" (click)="addNewItem()">Add Row</button>
+    <button type="button" class="btn mb-2" (click)="addNewItem()">Add Row</button>
   </form>
   <div class="modal-footer">
-    <button class="btn" type="submit" onclick="saveAll()">Save All</button>
+    <button class="btn" type="submit" (click)="saveAll()">Save All</button>
     <button type="button" class="btn" (click)="cancel()">Cancel</button>
   </div>
 </div>

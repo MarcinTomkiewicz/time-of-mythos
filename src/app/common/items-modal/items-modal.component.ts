@@ -424,16 +424,11 @@ export class ItemsModalComponent {
     bonusGroup.removeControl('attribute');
   }
 
-  log(data: any): void {
-    console.log(data);
-    
-  }
-
   createBonusGroup(bonus: IBonus): FormGroup {
     if (bonus.type === 'statChange') {
       return this.fb.group({
         type: [bonus.type, Validators.required],
-        attribute: [bonus.attribute || '', Validators.required],
+        attribute: [bonus.attribute ?? '', Validators.required],
         value: [bonus.value || null, [Validators.required, Validators.min(1)]],
       });
     } else {

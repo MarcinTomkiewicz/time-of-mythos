@@ -139,19 +139,19 @@ export class CreateCharacterComponent {
       });
 
     this.firestoreService
-      .getMetadata<IMetadata>('originsMetadata')
+      .getMetadata('originsMetadata')
       .subscribe((originsMetadata) => {
         this.originsMetadata = originsMetadata;
       });
 
     this.firestoreService
-      .getMetadata<IMetadata>('attributesMetdata')
+      .getMetadata('attributesMetdata')
       .subscribe((attributesMetadata) => {
         this.attributesMetadata = attributesMetadata;
       });
 
     this.firestoreService
-      .getMetadata<IMetadata>('heroDataMetadata')
+      .getMetadata('heroDataMetadata')
       .subscribe((heroDataMetadata) => {
         this.heroDataMetadata = heroDataMetadata;
       });

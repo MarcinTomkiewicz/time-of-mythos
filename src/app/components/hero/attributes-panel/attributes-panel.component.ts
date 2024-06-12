@@ -58,13 +58,13 @@ export class AttributesPanelComponent implements OnInit {
       });
 
     this.firestoreService
-      .getMetadata<IMetadata>('attributesMetdata')
+      .getMetadata('attributesMetdata')
       .subscribe((attributesMetadata) => {
         this.attributesMetadata = attributesMetadata;
       });
 
     this.firestoreService
-      .getMetadata<IMetadata>('heroDataMetadata')
+      .getMetadata('heroDataMetadata')
       .subscribe((heroDataMetadata) => {
         this.heroDataMetadata = heroDataMetadata;
       });

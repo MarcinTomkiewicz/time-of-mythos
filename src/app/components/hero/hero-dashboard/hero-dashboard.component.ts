@@ -53,10 +53,10 @@ export class HeroDashboardComponent implements OnInit {
       switchMap((user: IUser | null) => {
         if (user && this.userUid) {
           return forkJoin({
-            attributesMetadata: this.firestoreService.getMetadata<IMetadata>('attributesMetdata'),
-            heroDataMetadata: this.firestoreService.getMetadata<IMetadata>('heroDataMetadata'),
-            originsMetadata: this.firestoreService.getMetadata<IMetadata>('originsMetadata'),
-            ranksMetadata: this.firestoreService.getMetadata<IMetadata>('ranksMetadata'),
+            attributesMetadata: this.firestoreService.getMetadata('attributesMetdata'),
+            heroDataMetadata: this.firestoreService.getMetadata('heroDataMetadata'),
+            originsMetadata: this.firestoreService.getMetadata('originsMetadata'),
+            ranksMetadata: this.firestoreService.getMetadata('ranksMetadata'),
             originsDefinitions: this.firestoreService.getDefinitions('definitions/origins', 'id'),
             attributesDefinitions: this.firestoreService.getDefinitions('definitions/attributes', 'id'),
             heroData: this.firestoreService.getHeroData<IHeroData>(this.userUid, 'heroData'),

@@ -7,14 +7,19 @@
       <div class="d-flex flex-row justify-content-between w-100">
         <div>Name:</div>
         <div class="w-50">
-          <input class="form-control" type="text" formControlName="name" />
+          <input class="form-control form-control-sm" type="text" formControlName="name" />
         </div>
       </div>
 
       <div class="d-flex flex-row justify-content-between w-100">
         <div>ID:</div>
         <div class="w-50">
-          <input class="form-control" type="number" formControlName="id" readonly />
+          <input
+            class="form-control form-control-sm"
+            type="number"
+            formControlName="id"
+            readonly
+          />
         </div>
       </div>
 
@@ -28,7 +33,7 @@
       >
         <div>Type:</div>
         <div class="w-50">
-          <select formControlName="type"  class="form-select form-select-sm">
+          <select formControlName="type" class="form-select form-select-sm">
             <option *ngFor="let type of itemTypes" [value]="type">
               {{ type }}
             </option>
@@ -42,9 +47,13 @@
       >
         <div>Can Appear On:</div>
         <div class="w-50 d-flex flex-column">
-          <div formGroupName="canAppearOn" class="d-flex flex-row justify-content-between">
+          <div
+            formGroupName="canAppearOn"
+            class="d-flex flex-row justify-content-between"
+          >
             <div>
-              <input class="form-check-input"
+              <input
+                class="form-check-input"
                 type="checkbox"
                 (change)="onCheckboxChange('Weapon', $event)"
               />
@@ -52,7 +61,8 @@
             </div>
 
             <div>
-              <input class="form-check-input"
+              <input
+                class="form-check-input"
                 type="checkbox"
                 (change)="onCheckboxChange('Armor', $event)"
               />
@@ -60,7 +70,8 @@
             </div>
 
             <div>
-              <input class="form-check-input"
+              <input
+                class="form-check-input"
                 type="checkbox"
                 (change)="onCheckboxChange('Jewelry', $event)"
               />
@@ -70,7 +81,11 @@
           <div class="d-flex flex-row justify-content-between">
             <div *ngIf="canAppearOnOptions.value.includes('Weapon')">
               <div>Weapon Types:</div>
-              <select [formControl]="weaponsArray" multiple class="form-select form-select">
+              <select
+                [formControl]="weaponsArray"
+                multiple
+                class="form-select form-select"
+              >
                 <option *ngFor="let type of weaponsTypes" [value]="type">
                   {{ type }}
                 </option>
@@ -78,7 +93,11 @@
             </div>
             <div *ngIf="canAppearOnOptions.value.includes('Armor')">
               <div>Armor Types:</div>
-              <select [formControl]="armorArray" multiple class="form-select form-select">
+              <select
+                [formControl]="armorArray"
+                multiple
+                class="form-select form-select"
+              >
                 <option *ngFor="let type of armorTypes" [value]="type">
                   {{ type }}
                 </option>
@@ -86,7 +105,11 @@
             </div>
             <div *ngIf="canAppearOnOptions.value.includes('Jewelry')">
               <div>Jewelry Types:</div>
-              <select [formControl]="jewelryArray" multiple class="form-select form-select">
+              <select
+                [formControl]="jewelryArray"
+                multiple
+                class="form-select form-select"
+              >
                 <option *ngFor="let type of jewelryTypes" [value]="type">
                   {{ type }}
                 </option>
@@ -102,7 +125,12 @@
       >
         <label for="isSetItem">Is Set Item:</label>
         <div class="w-50">
-          <input class="form-check-input" id="isSetItem" type="checkbox" formControlName="isSetItem" />
+          <input
+            class="form-check-input"
+            id="isSetItem"
+            type="checkbox"
+            formControlName="isSetItem"
+          />
         </div>
       </div>
 
@@ -115,7 +143,7 @@
       >
         <div>Set Name:</div>
         <div class="w-50">
-          <input class="form-control" formControlName="setName" />
+          <input class="form-control form-control-sm" formControlName="setName" />
         </div>
       </div>
 
@@ -141,26 +169,35 @@
             </select>
             <div
               *ngIf="reqGroup.get('buildingId')"
-              class="d-flex flex-row gap-2"
+              class="d-flex flex-row gap-2 align-items-center m-0"
             >
-              <select formControlName="buildingId" class="form-select form-select-sm">
+              <select
+                formControlName="buildingId"
+                class="form-select form-select-sm"
+              >
+              
                 <option *ngFor="let key of buildingsKeys" [value]="key">
                   {{ buildingsMetadata[key].displayName || key }}
                 </option>
               </select>
-              <input class="form-control"
+              <input
+                class="form-control form-control-sm"
                 type="number"
                 formControlName="level"
                 placeholder="Level"
               />
             </div>
-            <div *ngIf="reqGroup.get('stat')" class="d-flex flex-row gap-2 align-items-center m-0">
+            <div
+              *ngIf="reqGroup.get('stat')"
+              class="d-flex flex-row gap-2 align-items-center m-0"
+            >
               <select formControlName="stat" class="form-select form-select-sm">
                 <option *ngFor="let key of attributesKeys" [value]="key">
                   {{ attributesMetadata[key].displayName || key }}
                 </option>
               </select>
-              <input class="form-control"
+              <input
+                class="form-control form-control-sm"
                 type="number"
                 formControlName="value"
                 placeholder="Value"
@@ -172,8 +209,10 @@
                 !reqGroup.get('stat') &&
                 !reqGroup.get('buildingId')
               "
+              class="d-flex flex-row gap-2 align-items-center m-0"
             >
-              <input class="form-control"
+              <input
+                class="form-control form-control-sm"
                 type="number"
                 formControlName="value"
                 placeholder="Minimum Hero Level"
@@ -195,7 +234,11 @@
       >
         <div>Minimum Damage:</div>
         <div class="w-50">
-          <input class="form-control" type="number" formControlName="minDamage" />
+          <input
+            class="form-control form-control-sm"
+            type="number"
+            formControlName="minDamage"
+          />
         </div>
       </div>
 
@@ -205,7 +248,11 @@
       >
         <div>Maximum Damage:</div>
         <div class="w-50">
-          <input class="form-control" type="number" formControlName="maxDamage" />
+          <input
+            class="form-control form-control-sm"
+            type="number"
+            formControlName="maxDamage"
+          />
         </div>
       </div>
 
@@ -215,41 +262,44 @@
       >
         <div>Defense:</div>
         <div class="w-50">
-          <input class="form-control" type="number" formControlName="defense" />
+          <input class="form-control form-control-sm" type="number" formControlName="defense" />
         </div>
       </div>
 
-      <div
-        class="d-flex flex-row justify-content-between w-100"
-        formArrayName="bonuses"
-      >
+      <div class="d-flex flex-row justify-content-between w-100" formArrayName="bonuses">
         <div>Bonuses:</div>
         <div class="w-50 d-flex flex-column gap-2">
-          <div
-            *ngFor="let bonusGroup of bonuses.controls; let i = index"
-            [formGroupName]="i"
-            class="d-flex flex-row gap-2 align-items-center"
-          >
-            <select formControlName="type" class="form-select form-select-sm">
+          <div *ngFor="let bonusGroup of bonuses.controls; let i = index" [formGroupName]="i" class="d-flex flex-row gap-2 align-items-center">
+            <select formControlName="type" class="form-select form-select-sm" (change)="onBonusTypeChange(i)">
               <option *ngFor="let key of bonusesKeys" [value]="key">
                 {{ bonusesMetadata[key].displayName || key }}
               </option>
             </select>
-            <input class="form-control" type="number" formControlName="value" placeholder="Value" />
-            <button type="button" class="btn" (click)="removeBonus(i)">
-              -
-            </button>
+            
+              <select *ngIf="bonusGroup.get('type')?.value === 'statChange'" class="form-select form-select-sm" formControlName="attribute">
+                <option *ngFor="let key of attributesKeys" [value]="key">
+                  {{ attributesMetadata[key].displayName || key }}
+                </option>
+              </select>
+            
+            <input class="form-control form-control-sm" type="number" formControlName="value" placeholder="Value" />
+            <button type="button" class="btn" (click)="removeBonus(i)">-</button>
           </div>
-          <button type="button" class="btn mt-2" (click)="addBonus()">
-            Add bonus
-          </button>
+          <button type="button" class="btn mt-2" (click)="addBonus()">Add bonus</button>
         </div>
       </div>
 
       <div class="d-flex flex-row justify-content-between w-100">
         <div>Value:</div>
-        <div class="w-50 d-flex flex-row justify-content-start align-items-center gap-2">
-          <input class="form-control flex-grow-1" type="number" formControlName="value" /> drachmas
+        <div
+          class="w-50 d-flex flex-row justify-content-start align-items-center gap-2"
+        >
+          <input
+            class="form-control form-control-sm flex-grow-1"
+            type="number"
+            formControlName="value"
+          />
+          drachmas
         </div>
       </div>
 
@@ -259,10 +309,11 @@
       >
         <div>Icon:</div>
         <div class="d-flex flex-row justify-content-start gap-2 w-50">
-          <input class="form-control"
+          <input
+            class="form-control form-control-sm"
             type="file"
             formControlName="icon"
-            class="form-control"
+            class="form-control form-control-sm"
             (change)="onFileSelect($event)"
             accept="image/*"
           />

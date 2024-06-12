@@ -15,7 +15,7 @@ import {
   uploadBytes,
 } from '@angular/fire/storage';
 import { DataProcessingService } from './data-processing-service';
-import { DocumentData, PartialWithFieldValue } from 'firebase/firestore';
+import { DocumentData, PartialWithFieldValue, writeBatch } from 'firebase/firestore';
 import { IBuilding } from '../interfaces/definitions/i-building';
 import {
   IArmor,
@@ -216,5 +216,29 @@ export class FirestoreService {
           observer.error(error);
         });
     });
+  }
+
+  addPrefixes(prefixes: IPrefix[]): Observable<void> {
+    const prefixDocRef = doc(this.firestore, 'definitions/prefix');
+    const batch = writeBatch(this.firestore);
+
+    prefixes.forEach(prefix => {
+      const fieldName = this.commonService.toCamelCase(prefix.name);
+      batch.update(prefixDocRef, { [fieldName]: prefix });
+    });
+
+    return from(batch.commit());
+  }
+
+  addSuffixes(suffixes: ISuffix[]): Observable<void> {
+    const suffixDocRef = doc(this.firestore, 'definitions/suffix');
+    const batch = writeBatch(this.firestore);
+
+    suffixes.forEach(suffix => {
+      const fieldName = this.commonService.toCamelCase(suffix.name);
+      batch.update(suffixDocRef, { [fieldName]: suffix });
+    });
+
+    return from(batch.commit());
   }
 }

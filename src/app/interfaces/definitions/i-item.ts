@@ -10,7 +10,7 @@ export interface IItem {
     requirements: IRequirement[];
     bonuses: IBonus[] | null;
     value: number;
-    icon: string;
+    icon?: string;
   }
 
   export interface IWeapon extends IItem {
@@ -31,7 +31,6 @@ export interface IItem {
     requirements: IRequirement[];
     bonuses: IBonus[] | null;
     value: number;
-    icon: string;
   }
 
   export interface ISuffix {
@@ -41,5 +40,6 @@ export interface IItem {
     requirements: IRequirement[];
     bonuses: IBonus[] | null;
     value: number;
-    icon: string;
   }
+
+  export type ItemWithOptionalIcon = IItem | IArmor | (IPrefix & { icon?: string }) | (ISuffix & { icon?: string });

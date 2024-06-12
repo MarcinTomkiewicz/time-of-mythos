@@ -10,10 +10,12 @@ import {
   IItem,
   IPrefix,
   ISuffix,
+  ItemWithOptionalIcon,
 } from '../../interfaces/definitions/i-item';
 import { CapitalizePipe } from '../../pipes/capitalize-pipe';
 import { CommonService } from '../../services/common-service';
 import { Observable, forkJoin, map, switchMap } from 'rxjs';
+import { PrefixSuffixTableComponent } from '../prefix-suffix-table/prefix-suffix-table.component';
 
 @Component({
   selector: 'app-manage-items',
@@ -30,7 +32,7 @@ export class ManageItemsComponent implements OnInit {
   itemTypes: string[] = ['weapon', 'armor', 'jewelry', 'prefix', 'suffix'];
   currentItemType: 'weapon' | 'armor' | 'jewelry' | 'prefix' | 'suffix' | null =
     null;
-  items: (IItem | IArmor | IPrefix | ISuffix)[] = [];
+  items: ItemWithOptionalIcon[] = [];
   selectedItem = '';
   sortColumn: string = '';
   sortAscending: boolean = true;
@@ -62,25 +64,32 @@ export class ManageItemsComponent implements OnInit {
     modalRef.componentInstance.itemType = itemType;
   }
 
+  openBulkCreateAfixes(mode: string) {
+    const modalRef = this.modalService.open(PrefixSuffixTableComponent, {
+      size: 'xl',
+    });
+    modalRef.componentInstance.mode = mode;
+  }
+
   showItems(itemType: string) {
     this.firestoreService
       .getDefinitions(`definitions/${itemType}`, 'id')
       .pipe(
-        switchMap((items: { [key: string]: IItem | IArmor | IPrefix | ISuffix }) => {
+        switchMap((items: { [key: string]: IItem | IArmor }) => {
           const itemArray = Object.values(items);
           const observables = itemArray.map(item => this.fetchItemIconUrl(item));
           return forkJoin(observables);
         })
       )
       .subscribe(
-        (items: (IItem | IArmor | IPrefix | ISuffix)[]) => {
+        (items: (IItem | IArmor )[]) => {
           this.items = items;
           this.selectedItem = itemType;
         }
       );
   }
 
-  fetchItemIconUrl(item: IItem | IArmor | IPrefix | ISuffix): Observable<IItem | IArmor | IPrefix | ISuffix> {
+  fetchItemIconUrl(item: IItem | IArmor ): Observable<IItem | IArmor> {
     if (!item.icon) {
       return new Observable(observer => {
         observer.next(item);

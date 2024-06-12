@@ -19,6 +19,12 @@
   <button type="button" class="btn" (click)="openManageItemsModal('suffix')">
     Create suffix
   </button>
+  <button type="button" class="btn" (click)="openBulkCreateAfixes('prefix')">
+    Bulk create prefix
+  </button>
+  <button type="button" class="btn" (click)="openBulkCreateAfixes('suffix')">
+    Bulk create suffix
+  </button>
 </div>
 
 <div
@@ -118,7 +124,7 @@
     <tbody>
       <tr *ngFor="let item of items">
         <td *ngIf="selectedItem !== 'prefix' && selectedItem !== 'suffix'">
-          <img
+          <img *ngIf="item.icon"
             [src]="item.icon"
             [alt]="commonService.capitalizeWords(item.name)"
             style="width: 100px; height: auto"

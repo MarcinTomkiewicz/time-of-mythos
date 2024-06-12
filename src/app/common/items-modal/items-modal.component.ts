@@ -399,19 +399,55 @@ export class ItemsModalComponent {
     return this.itemForm.get('bonuses') as FormArray;
   }
 
+  onBonusTypeChange(index: number): void {
+    const bonusGroup = this.bonuses.at(index) as FormGroup;
+    const typeControl = bonusGroup.get('type');
+  
+    if (!typeControl) {
+      return;
+    }
+  
+    const isStatChange = typeControl.value === 'statChange';
+  
+    if (isStatChange && !bonusGroup.get('attribute')) {
+      this.addAttributeControl(bonusGroup);
+    } else if (!isStatChange && bonusGroup.get('attribute')) {
+      this.removeAttributeControl(bonusGroup);
+    }
+  }
+  
+  private addAttributeControl(bonusGroup: FormGroup): void {
+    bonusGroup.addControl('attribute', this.fb.control('', Validators.required));
+  }
+  
+  private removeAttributeControl(bonusGroup: FormGroup): void {
+    bonusGroup.removeControl('attribute');
+  }
+
+  log(data: any): void {
+    console.log(data);
+    
+  }
+
   createBonusGroup(bonus: IBonus): FormGroup {
-    return this.fb.group({
-      type: [bonus.type, Validators.required],
-      value: [bonus.value, [Validators.required, Validators.min(1)]],
-    });
+    if (bonus.type === 'statChange') {
+      return this.fb.group({
+        type: [bonus.type, Validators.required],
+        attribute: [bonus.attribute || '', Validators.required],
+        value: [bonus.value || null, [Validators.required, Validators.min(1)]],
+      });
+    } else {
+      return this.fb.group({
+        type: [bonus.type, Validators.required],
+        value: [bonus.value || null, [Validators.required, Validators.min(1)]],
+      });
+    }
   }
 
   addBonus(): void {
-    if (this.bonuses.length < 3) {
-      this.bonuses.push(
-        this.createBonusGroup({ type: this.bonusesKeys[0], value: 0 })
-      );
-    }
+    this.bonuses.push(
+      this.createBonusGroup({ type: this.bonusesKeys[0], value: 0 })
+    );
   }
 
   removeBonus(index: number): void {
@@ -446,8 +482,8 @@ export class ItemsModalComponent {
               console.error('Error uploading file:', error);
             },
           });
-          console.log(this.itemForm.value);
-          
+        console.log(this.itemForm.value);
+
         this.firestoreService
           .createItem(`definitions/${this.itemType}`, {
             ...this.itemForm.value,

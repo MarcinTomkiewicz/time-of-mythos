@@ -27,7 +27,7 @@
 
 .menu-wrapper {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 10%;
   align-items: center;
   flex-direction: row;
@@ -40,7 +40,6 @@
 
 .menu {
   height: 2rem;
-  /* flex-grow: 1; */
   display: flex;
   justify-content: flex-start;
   flex-direction: row;

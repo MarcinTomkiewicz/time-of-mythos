@@ -5,6 +5,7 @@ import { NgFor, NgIf } from '@angular/common';
 import {
   FormArray,
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -34,6 +35,14 @@ export class PrefixSuffixTableComponent {
   attributesKeys: string[] = [];
   bonusesKeys: string[] = [];
   buildingsKeys: string[] = [];
+  weaponsTypes: string[] = ['1h', '2h', 'Range', 'Throwing', 'Tactical'];
+  armorTypes: string[] = ['Head', 'Chest', 'Feet', 'Hands', 'Legs'];
+  jewelryTypes: string[] = ['Ring', 'Amulet'];
+
+  selectedTypes: { [index: number]: string } = {};
+
+  selectedType: string | null = null;
+  selectedIndex = 0;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -95,6 +104,11 @@ export class PrefixSuffixTableComponent {
       name: [''],
       type: [this.mode],
       isPartOfSet: [false],
+      canAppearOn: this.fb.group({
+        weapon: [],
+        armor: [],
+        jewelry: [],
+      }),
       setName: [''],
       bonuses: this.fb.array([]),
       requirements: this.fb.array([]),
@@ -208,6 +222,40 @@ export class PrefixSuffixTableComponent {
     }
 
     return group;
+  }
+
+  onCheckboxChange(type: string, index: number) {
+    if (this.selectedTypes[index] === type) {
+      delete this.selectedTypes[index];
+    } else {
+      this.selectedTypes[index] = type;
+    }
+  }
+
+  addCanAppearOnControl(type: string) {
+    if (this.selectedIndex){
+    const canAppearOn = this.items.at(this.selectedIndex).get('canAppearOn') as FormGroup;
+    canAppearOn.addControl(type, this.fb.array([]));
+  }
+  }
+
+  removeCanAppearOnControl(type: string) {
+    if (this.selectedIndex){
+    const canAppearOn = this.items.at(this.selectedIndex).get('canAppearOn') as FormGroup;
+    canAppearOn.removeControl(type);
+    }
+  }
+
+  get weaponsArray(): FormControl {
+    return this.items.at(this.selectedIndex).get(['canAppearOn', 'weapon']) as FormControl;
+  }
+
+  get armorArray(): FormControl {
+    return this.items.at(this.selectedIndex).get(['canAppearOn', 'armor']) as FormControl;
+  }
+
+  get jewelryArray(): FormControl {
+    return this.items.at(this.selectedIndex).get(['canAppearOn', 'jewelry']) as FormControl;
   }
 
   onSubmit() {

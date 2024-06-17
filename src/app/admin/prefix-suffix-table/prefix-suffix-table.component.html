@@ -13,6 +13,7 @@
             <th>Name</th>
             <th *ngIf="mode === 'prefix'">Set</th>
             <th *ngIf="mode === 'prefix'">Set Name</th>
+            <th>Can appear on</th>
             <th>Requirements</th>
             <th>Bonuses</th>
             <th>Value</th>
@@ -43,6 +44,38 @@
                 formControlName="setName"
                 *ngIf="item.get('isPartOfSet')?.value"
               />
+            </td>
+            <td>
+              <input class="form-check-input"
+                     [disabled]="selectedTypes[i] && selectedTypes[i] !== 'Weapons'"
+                     type="checkbox"
+                     (change)="onCheckboxChange('Weapons', i)">
+              Weapons
+              <input class="form-check-input"
+                     [disabled]="selectedTypes[i] && selectedTypes[i] !== 'Armors'"
+                     type="checkbox"
+                     (change)="onCheckboxChange('Armors', i)">
+              Armors
+              <input class="form-check-input"
+                     [disabled]="selectedTypes[i] && selectedTypes[i] !== 'Jewelry'"
+                     type="checkbox"
+                     (change)="onCheckboxChange('Jewelry', i)">
+              Jewelry
+              <div *ngIf="selectedTypes[i] === 'Weapons'">
+                <select multiple class="form-select" [formControl]="weaponsArray">
+                  <option *ngFor="let type of weaponsTypes" [value]="type">{{ type }}</option>
+                </select>
+              </div>
+              <div *ngIf="selectedTypes[i] === 'Armors'">
+                <select multiple class="form-select" [formControl]="armorArray">
+                  <option *ngFor="let type of armorTypes" [value]="type">{{ type }}</option>
+                </select>
+              </div>
+              <div *ngIf="selectedTypes[i] === 'Jewelry'">
+                <select multiple class="form-select" [formControl]="jewelryArray">
+                  <option *ngFor="let type of jewelryTypes" [value]="type">{{ type }}</option>
+                </select>
+              </div>
             </td>
             <td formArrayName="requirements">
               <div

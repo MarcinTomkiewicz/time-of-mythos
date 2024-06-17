@@ -10,13 +10,14 @@
       >
         <thead>
           <tr>
+            <th style="width: 80px;">ID</th>
             <th>Name</th>
             <th *ngIf="mode === 'prefix'">Set</th>
             <th *ngIf="mode === 'prefix'">Set Name</th>
             <th>Can appear on</th>
             <th>Requirements</th>
             <th>Bonuses</th>
-            <th>Value</th>
+            <th style="width: 90px;">Value</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -25,6 +26,9 @@
             *ngFor="let item of items.controls; let i = index"
             [formGroupName]="i"
           >
+          <td>
+            <input class="form-control form-control-sm" type="text" formControlName="id" readonly />
+          </td>
             <td>
               <input
                 class="form-control form-control-sm"
@@ -228,7 +232,7 @@
           </tr>
         </tbody>
       </table>
-      <button type="button" class="btn mb-2" (click)="addNewItem()">
+      <button type="button" class="btn mb-2" (click)="addNewItem(items.length)">
         Add Row
       </button>
     </form>

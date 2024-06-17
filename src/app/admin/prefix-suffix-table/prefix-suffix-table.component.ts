@@ -38,6 +38,7 @@ export class PrefixSuffixTableComponent {
   weaponsTypes: string[] = ['1h', '2h', 'Range', 'Throwing', 'Tactical'];
   armorTypes: string[] = ['Head', 'Chest', 'Feet', 'Hands', 'Legs'];
   jewelryTypes: string[] = ['Ring', 'Amulet'];
+  nextID: number = 0;
 
   selectedTypes: { [index: number]: string } = {};
 
@@ -64,6 +65,7 @@ export class PrefixSuffixTableComponent {
       attributes: this.firestoreService.getMetadata('attributesMetdata'),
       bonuses: this.firestoreService.getMetadata('bonusesMetadata', true),
       buildings: this.firestoreService.getMetadata('buildingsMetadata'),
+      nextID: this.firestoreService.assignNextID(`definitions/${this.mode}`)
     }).subscribe({
       next: (data) => {
         this.resourcesMetadata = data.resources;
@@ -78,7 +80,9 @@ export class PrefixSuffixTableComponent {
         this.buildingsMetadata = data.buildings;
         this.buildingsKeys = Object.keys(this.buildingsMetadata);
 
-        this.addNewItem();
+        this.nextID = data.nextID;
+
+        this.addNewItem(0);
       },
       error: (error) => {
         console.error('Error loading metadata:', error);
@@ -98,9 +102,9 @@ export class PrefixSuffixTableComponent {
     return item.get('requirements') as FormArray;
   }
 
-  addNewItem() {
+  addNewItem(nextIndex: number) {   
     const items = this.fb.group({
-      id: [Date.now()],
+      id: [{value: this.nextID + nextIndex, disabled: true}],
       name: [''],
       type: [this.mode],
       isPartOfSet: [false],

@@ -11,7 +11,7 @@
     [originsDefinition]="originsDefinitions"
     (currentIndexChange)="currentIndexChange($event)"
     [currentIndex]="currentIndex"
- >
+  >
   </app-carousel>
   <button class="btn" style="align-self: self-end" (click)="chooseOrigin()">
     Choose this origin!
@@ -44,10 +44,10 @@
           let last = last
         "
         class="d-flex flex-row"
-     >
+      >
         <div>
           <span style="font-weight: bold">{{ bonus.stat }}</span
-         >: {{ bonus.bonus> 0 ? "+" + bonus.bonus : "-" + bonus.bonus
+          >: {{ bonus.bonus > 0 ? "+" + bonus.bonus : "-" + bonus.bonus
           }}<ng-container *ngIf="!last">,</ng-container>
           <ng-container *ngIf="last">.</ng-container>
         </div>
@@ -57,10 +57,11 @@
       [formGroup]="characterForm"
       class="d-flex flex-column align-items-center"
       style="gap: 5px"
-   >
+    >
       <div class="d-flex flex-column">
         <label for="characterName">Character name:</label>
         <input
+          class="form-control"
           type="text"
           id="characterName"
           formControlName="characterName"
@@ -76,7 +77,7 @@
           characterForm.get('characterName')?.invalid &&
           characterForm.get('characterName')?.touched
         "
-     >
+      >
         {{
           formsService.getErrorMessage(
             characterForm.get("characterName"),
@@ -85,7 +86,12 @@
         }}
       </div>
     </form>
-    <button class="btn" style="align-self: self-end" (click)="chooseName()" [disabled]="characterForm.get('characterName')?.invalid">
+    <button
+      class="btn"
+      style="align-self: self-end"
+      (click)="chooseName()"
+      [disabled]="characterForm.get('characterName')?.invalid"
+    >
       Choose this name!
     </button>
   </div>
@@ -94,84 +100,178 @@
   *ngIf="originChosen && nameChosen"
   class="d-flex flex-column align-items-center gap-2 w-100 pb-3"
 >
-<h4>Personal info</h4>
-<form [formGroup]="characterForm" (ngSubmit)="register()" enctype="multipart/form-data" class="w-50">
-  <div  class="d-flex flex-column">
-    <label for="emailRegister">Email address:</label>
-    <input type="email" id="emailRegister" formControlName="email" [class.is-invalid]="
-    characterForm.get('email')?.invalid &&
-    characterForm.get('email')?.touched
-  ">
-    <div *ngIf="characterForm.get('email')?.invalid && characterForm.get('email')?.touched" class="invalid-feedback">
-      Please enter a valid email address.
+  <h4>Personal info</h4>
+  <form
+    [formGroup]="characterForm"
+    (ngSubmit)="register()"
+    enctype="multipart/form-data"
+    class="w-50"
+  >
+    <div class="d-flex flex-column">
+      <label for="emailRegister">Email address:</label>
+      <input
+        class="form-control"
+        type="email"
+        id="emailRegister"
+        formControlName="email"
+        [class.is-invalid]="
+          characterForm.get('email')?.invalid &&
+          characterForm.get('email')?.touched
+        "
+      />
+      <div
+        *ngIf="
+          characterForm.get('email')?.invalid &&
+          characterForm.get('email')?.touched
+        "
+        class="invalid-feedback"
+      >
+        Please enter a valid email address.
+      </div>
     </div>
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="passwordRegister">Password:</label>
-    <input type="password" id="passwordRegister" formControlName="password" [class.is-invalid]="
-    characterForm.get('password')?.invalid &&
-    characterForm.get('password')?.touched
-  ">
-    <div *ngIf="characterForm.get('password')?.invalid && characterForm.get('password')?.touched" class="invalid-feedback">
-      Password is  and must be at least 6 characters long.
+    <div class="d-flex flex-column">
+      <label for="passwordRegister">Password:</label>
+      <input
+        class="form-control"
+        type="password"
+        id="passwordRegister"
+        formControlName="password"
+        [class.is-invalid]="
+          characterForm.get('password')?.invalid &&
+          characterForm.get('password')?.touched
+        "
+      />
+      <div
+        *ngIf="
+          characterForm.get('password')?.invalid &&
+          characterForm.get('password')?.touched
+        "
+        class="invalid-feedback"
+      >
+        Password is and must be at least 6 characters long.
+      </div>
     </div>
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="name">Nickname:</label>
-    <input type="text" id="name" formControlName="name" [class.is-invalid]="
-    characterForm.get('name')?.invalid &&
-    characterForm.get('name')?.touched
-  ">
-    <div *ngIf="characterForm.get('name')?.invalid && characterForm.get('name')?.touched" class="invalid-feedback">
-      Nickname is required.
+    <div class="d-flex flex-column">
+      <label for="name">Nickname:</label>
+      <input
+        class="form-control"
+        type="text"
+        id="name"
+        formControlName="name"
+        [class.is-invalid]="
+          characterForm.get('name')?.invalid &&
+          characterForm.get('name')?.touched
+        "
+      />
+      <div
+        *ngIf="
+          characterForm.get('name')?.invalid &&
+          characterForm.get('name')?.touched
+        "
+        class="invalid-feedback"
+      >
+        Nickname is required.
+      </div>
     </div>
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="birthday">Birthday:</label>
-    <input type="date" id="birthday" formControlName="birthday" [class.is-invalid]="
-    characterForm.get('birthday')?.invalid &&
-    characterForm.get('birthday')?.touched
-  ">
-    <div *ngIf="characterForm.get('birthday')?.invalid && characterForm.get('birthday')?.touched" class="invalid-feedback">
-      Birthday is required.
+    <div class="d-flex flex-column">
+      <label for="birthday">Birthday:</label>
+      <input
+        class="form-control"
+        type="date"
+        id="birthday"
+        formControlName="birthday"
+        [class.is-invalid]="
+          characterForm.get('birthday')?.invalid &&
+          characterForm.get('birthday')?.touched
+        "
+      />
+      <div
+        *ngIf="
+          characterForm.get('birthday')?.invalid &&
+          characterForm.get('birthday')?.touched
+        "
+        class="invalid-feedback"
+      >
+        Birthday is required.
+      </div>
     </div>
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="city">City:</label>
-    <input type="text" id="city" formControlName="city">
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="profilePicture">Profile Picture:</label>
-    <input type="file" id="profilePicture" formControlName="profilePicture" class="form-control-file" (change)="onFileSelect($event)" accept="image/*">
-  </div>
-  <div>
-    <div>Preview:</div>
-    <div *ngIf="characterForm.get('profilePicture')?.value" class="text-center">
-      <img [src]="characterForm.get('profilePicture')?.value" alt="Uploaded by user" class="img-fluid" style="max-width: 200px; height: auto; background: transparent;">
+    <div class="d-flex flex-column">
+      <label for="city">City:</label>
+      <input
+        class="form-control"
+        type="text"
+        id="city"
+        formControlName="city"
+      />
     </div>
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="facebook">Facebook:</label>
-    <input type="text" id="facebook" formControlName="facebook">
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="twitter">Twitter:</label>
-    <input type="text" id="twitter" formControlName="twitter">
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="linkedIn">LinkedIn:</label>
-    <input type="text" id="linkedIn" formControlName="linkedIn">
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="instagram">Instagram:</label>
-    <input type="text" id="instagram" formControlName="instagram">
-  </div>
-  <div  class="d-flex flex-column">
-    <label for="bio">Bio:</label>
-    <textarea id="bio" formControlName="bio"></textarea>
-  </div>
-  <button type="submit" class="btn" [disabled]="characterForm.invalid">
-    Start journey!
-  </button>
-</form>
+    <div class="d-flex flex-column">
+      <label for="profilePicture">Profile Picture:</label>
+      <input
+        class="form-control"
+        type="file"
+        id="profilePicture"
+        formControlName="profilePicture"
+        class="form-control-file"
+        (change)="onFileSelect($event)"
+        accept="image/*"
+      />
+    </div>
+    <div>
+      <div>Preview:</div>
+      <div
+        *ngIf="characterForm.get('profilePicture')?.value"
+        class="text-center"
+      >
+        <img
+          [src]="characterForm.get('profilePicture')?.value"
+          alt="Uploaded by user"
+          class="img-fluid"
+          style="max-width: 200px; height: auto; background: transparent"
+        />
+      </div>
+    </div>
+    <div class="d-flex flex-column">
+      <label for="facebook">Facebook:</label>
+      <input
+        class="form-control"
+        type="text"
+        id="facebook"
+        formControlName="facebook"
+      />
+    </div>
+    <div class="d-flex flex-column">
+      <label for="twitter">Twitter:</label>
+      <input
+        class="form-control"
+        type="text"
+        id="twitter"
+        formControlName="twitter"
+      />
+    </div>
+    <div class="d-flex flex-column">
+      <label for="linkedIn">LinkedIn:</label>
+      <input
+        class="form-control"
+        type="text"
+        id="linkedIn"
+        formControlName="linkedIn"
+      />
+    </div>
+    <div class="d-flex flex-column">
+      <label for="instagram">Instagram:</label>
+      <input
+        class="form-control"
+        type="text"
+        id="instagram"
+        formControlName="instagram"
+      />
+    </div>
+    <div class="d-flex flex-column">
+      <label for="bio">Bio:</label>
+      <textarea id="bio" formControlName="bio"></textarea>
+    </div>
+    <button type="submit" class="btn" [disabled]="characterForm.invalid">
+      Start journey!
+    </button>
+  </form>
 </div>

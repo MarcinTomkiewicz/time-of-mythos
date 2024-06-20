@@ -42,4 +42,4 @@ export interface IItem {
     value: number;
   }
 
-  export type ItemWithOptionalIcon = IItem | IArmor | (IPrefix & { icon?: string }) | (ISuffix & { icon?: string });
+  export type ItemWithOptionalIcon = IItem | IWeapon | IArmor | (IPrefix & { icon?: string }) | (ISuffix & { icon?: string });

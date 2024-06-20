@@ -103,6 +103,14 @@
             ></i
           ></span>
         </th>
+        <th *ngIf="selectedItem === 'prefix' || selectedItem === 'suffix'">
+          Bonuses
+        </th>        <th *ngIf="selectedItem === 'weapon'">
+          Damage
+        </th>
+        <th *ngIf="selectedItem === 'armor'">
+          Defense
+        </th>
         <th
           tabindex="0"
           as
@@ -135,6 +143,22 @@
           {{ item.type }}
         </td>
         <td>{{ item.id }}</td>
+        <td *ngIf="selectedItem === 'weapon'">
+          <ul class="list-group list-group-flush transparent-list non-padding-list">
+            <li class="list-group-item"><span>Minimum damage: {{ isWeapon(item) ? item.minDamage : ''}}</span></li>
+            <li class="list-group-item"><span>Maximum damage: {{ isWeapon(item) ? item.maxDamage : ''}}</span></li>
+          </ul>
+        </td>
+        <td *ngIf="selectedItem === 'armor'">
+          <ul class="list-group list-group-flush transparent-list non-padding-list">
+            <li class="list-group-item"><span>{{ isArmor(item) ? item.defense : ''}}</span></li>
+          </ul>
+        </td>
+        <td *ngIf="selectedItem === 'prefix' || selectedItem === 'suffix'">
+          <ul *ngFor="let bonus of item.bonuses" class="list-group list-group-flush transparent-list non-padding-list">
+            <li class="list-group-item"><span>{{ bonus.attribute && bonus.type === 'attributeChange' ? attributesMetadata[bonus.attribute].displayName : bonus.type === 'resourceGrowth' ? bonus.resource && resourcesMetadata[bonus.resource] : bonusMetadata[bonus.type].displayName }}: {{ bonus.value}}</span></li>
+          </ul>
+        </td>
         <td>{{ item.value }}</td>
         <td>
           <button class="btn" (click)="editItem(item)">Edit</button>

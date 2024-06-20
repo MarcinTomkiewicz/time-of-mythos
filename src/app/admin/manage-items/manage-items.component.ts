@@ -10,12 +10,14 @@ import {
   IItem,
   IPrefix,
   ISuffix,
+  IWeapon,
   ItemWithOptionalIcon,
 } from '../../interfaces/definitions/i-item';
 import { CapitalizePipe } from '../../pipes/capitalize-pipe';
 import { CommonService } from '../../services/common-service';
 import { Observable, forkJoin, map, switchMap } from 'rxjs';
 import { PrefixSuffixTableComponent } from '../prefix-suffix-table/prefix-suffix-table.component';
+import { IMetadata } from '../../interfaces/metadata/i-metadata';
 
 @Component({
   selector: 'app-manage-items',
@@ -36,6 +38,9 @@ export class ManageItemsComponent implements OnInit {
   selectedItem = '';
   sortColumn: string = '';
   sortAscending: boolean = true;
+  bonusMetadata!: { [key: string]: IMetadata };
+  resourcesMetadata!: { [key: string]: IMetadata };
+  attributesMetadata!: { [key: string]: IMetadata };
 
   constructor(
     private modalService: NgbModal,
@@ -51,6 +56,23 @@ export class ManageItemsComponent implements OnInit {
       this.user = user;
       if (this.userUid && this.user?.isAdmin) {
         this.isAdmin = true;
+
+        forkJoin({
+          resources: this.firestoreService.getMetadata('resourcesMetadata'),
+          attributes: this.firestoreService.getMetadata('attributesMetdata'),
+          bonuses: this.firestoreService.getMetadata('bonusesMetadata', true),
+        }).subscribe({
+          next: (data) => {
+            this.resourcesMetadata = data.resources;
+            // this.resourceKeys = Object.keys(this.resourcesMetadata);
+
+            this.attributesMetadata = data.attributes;
+            // this.attributesKeys = Object.keys(this.attributesMetadata);
+
+            this.bonusMetadata = data.bonuses;
+            // this.bonusesKeys = Object.keys(this.bonusesMetadata);
+          },
+        });
       }
     });
   }
@@ -67,7 +89,7 @@ export class ManageItemsComponent implements OnInit {
   openBulkCreateAfixes(mode: string) {
     const modalRef = this.modalService.open(PrefixSuffixTableComponent, {
       fullscreen: true,
-      modalDialogClass: 'modal-blue'
+      modalDialogClass: 'modal-blue',
     });
     modalRef.componentInstance.mode = mode;
   }
@@ -78,27 +100,44 @@ export class ManageItemsComponent implements OnInit {
       .pipe(
         switchMap((items: { [key: string]: IItem | IArmor }) => {
           const itemArray = Object.values(items);
-          const observables = itemArray.map(item => this.fetchItemIconUrl(item));
+          const observables = itemArray.map((item) =>
+            this.fetchItemIconUrl(item)
+          );
           return forkJoin(observables);
         })
       )
-      .subscribe(
-        (items: (IItem | IArmor )[]) => {
-          this.items = items;
-          this.selectedItem = itemType;
-        }
-      );
+      .subscribe((items: (IItem | IArmor)[]) => {
+        this.items = items;
+        this.selectedItem = itemType;
+      });
   }
 
-  fetchItemIconUrl(item: IItem | IArmor ): Observable<IItem | IArmor> {
+  isWeapon(item: ItemWithOptionalIcon): item is IWeapon {
+    return (item as IWeapon).minDamage !== undefined && (item as IWeapon).maxDamage !== undefined;
+  }
+  
+  isArmor(item: ItemWithOptionalIcon): item is IArmor {
+    return (item as IArmor).defense !== undefined;
+  }
+
+  // displayWeaponStats(item: ItemWithOptionalIcon): IWeapon {
+  //   if (this.isWeapon(item)) {
+  //     return item;
+  //   }
+  //   else {
+  //     throw new Error('The item is not a weapon!')
+  //   }
+  // }
+
+  fetchItemIconUrl(item: IItem | IArmor): Observable<IItem | IArmor> {
     if (!item.icon) {
-      return new Observable(observer => {
+      return new Observable((observer) => {
         observer.next(item);
         observer.complete();
       });
     }
     return this.firestoreService.getDownloadUrl(item.icon).pipe(
-      map(url => {
+      map((url) => {
         item.icon = url;
         return item;
       })

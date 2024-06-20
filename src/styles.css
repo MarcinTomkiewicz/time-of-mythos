@@ -1,12 +1,12 @@
-@import '@fontsource/eb-garamond/index.css';
-@import '@fontsource/cormorant-garamond/index.css';
-@import '@fontsource/arvo/index.css';
-@import '@fontsource/aleo/index.css';
+@import "@fontsource/eb-garamond/index.css";
+@import "@fontsource/cormorant-garamond/index.css";
+@import "@fontsource/arvo/index.css";
+@import "@fontsource/aleo/index.css";
 
 body {
   font-size: 12px !important;
   color: #464646 !important;
-  font-family: "Aleo", serif!important;
+  font-family: "Aleo", serif !important;
   font-optical-sizing: auto;
   box-sizing: border-box;
   --s: 100px; /* control the size */
@@ -37,7 +37,7 @@ body {
 
 .btn {
   padding: 10px;
-  background-color: rgba(127, 191, 255, 0.8)!important;
+  background-color: rgba(127, 191, 255, 0.8) !important;
   border: 1px solid #ccc;
   border-radius: 10%;
   min-width: 90px;
@@ -128,12 +128,12 @@ body {
 }
 
 .transparent-table {
-  background-color: transparent!important;
+  background-color: transparent !important;
 }
 
 .transparent-table th,
 .transparent-table td {
-  background-color: transparent!important;
+  background-color: transparent !important;
 }
 
 .transparent-table-hover tbody tr:hover {
@@ -141,6 +141,15 @@ body {
 }
 
 .table-hover {
-  --bs-table-hover-bg: transparent!important;
-  --bs-table-hover-color: #f5f5f5!important;
+  --bs-table-hover-bg: transparent !important;
+  --bs-table-hover-color: #f5f5f5 !important;
+}
+
+.transparent-list {
+  --bs-list-group-bg: transparent !important;
+}
+
+.non-padding-list {
+  --bs-list-group-item-padding-x: 0!important;
+  --bs-list-group-item-padding-y: 0!important;
 }
